@@ -3,7 +3,7 @@ import scene_cube
 
 app = Ursina()
 
-scene_cube.create_cube()
+scene_cube.create_rubik()
 
 def input(key):
     scene_cube.input(key)
