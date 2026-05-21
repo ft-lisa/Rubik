@@ -6,6 +6,11 @@ cube_group = Entity()
 
 cubes = []
 
+def mouv_R():
+    for cube in cubes:
+        if cube.x == 1:
+            cube.animate_rotation_x(90)
+
 def create_cube(x, y, z):
 
     cube = Entity(
@@ -80,7 +85,7 @@ def create_rubik():
     for z in range(3):
         for y in range(3):
             for x in range(3):
-                cube = create_cube(x, y, z)
+                cube = create_cube(x - 1, y - 1, z - 1)
                 cubes.append(cube)
 
 dragging = False
