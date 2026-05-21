@@ -1,17 +1,16 @@
 from ursina import *
-import scene_cube
+import cube.cube as cube
+import cube.controls as controls
 
 app = Ursina()
 
-scene_cube.create_rubik()
-scene_cube.mouv_R()
+cube.create_cube()
 
 def input(key):
-    scene_cube.input(key)
+    controls.input(key)
 
 def update():
-    scene_cube.update()
-
+    controls.update()
 
 app.run()
 
