@@ -20,7 +20,7 @@ def create_cube(x, y, z):
     Entity(
         parent=cube,
         model='quad',
-        color=color.red,
+        color=color.green,
         position=(0, 0, -0.51),
         scale=(0.90)
     )
@@ -29,7 +29,7 @@ def create_cube(x, y, z):
     Entity(
         parent=cube,
         model='quad',
-        color=color.orange,
+        color=color.blue,
         rotation_y=180,
         position=(0, 0, 0.51),
         scale=(0.90)
@@ -39,7 +39,7 @@ def create_cube(x, y, z):
     Entity(
         parent=cube,
         model='quad',
-        color=color.blue,
+        color=color.red,
         rotation_y=-90,
         position=(0.51, 0, 0),
         scale=(0.90)
@@ -49,7 +49,7 @@ def create_cube(x, y, z):
     Entity(
         parent=cube,
         model='quad',
-        color=color.green,
+        color=color.orange,
         rotation_y=90,
         position=(-0.51, 0, 0),
         scale=(0.90)
