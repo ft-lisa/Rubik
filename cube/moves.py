@@ -9,10 +9,10 @@ def process_queue():
     global move_queue
     if not move_queue:
         return
-    next_move = move_queue.pop(0)
+    next_move, direction = move_queue.pop(0)
     func = globals().get('mouv_' + next_move)
     if func:
-        invoke(func, delay=0.01)
+        invoke(lambda: func(direction), delay=0.01)
 
 
 def snap_cube(cube):
@@ -36,10 +36,10 @@ def finish_move(pivot):
     process_queue()
 
 # DROITE
-def mouv_R():
+def mouv_R(direction):
     global is_animating, move_queue
     if is_animating:
-        move_queue.append('R')
+        move_queue.append(('R', direction))
         return
     is_animating = True
 
@@ -51,17 +51,17 @@ def mouv_R():
 
     pivot.position = (0, 0, 0)
 
-    pivot.animate_rotation_x(90, duration=0.2, curve=curve.linear)
+    pivot.animate_rotation_x(90 * direction, duration=0.2, curve=curve.linear)
 
 
 
     invoke(lambda: finish_move(pivot), delay=0.2)
 
 # AVANT
-def mouv_F():
+def mouv_F(direction):
     global is_animating, move_queue
     if is_animating:
-        move_queue.append('F')
+        move_queue.append(('F', direction))
         return
     is_animating = True
 
@@ -73,15 +73,15 @@ def mouv_F():
 
     pivot.position = (0, 0, 0)
 
-    pivot.animate_rotation_z(90, duration=0.2, curve=curve.linear)
+    pivot.animate_rotation_z(90 * direction, duration=0.2, curve=curve.linear)
 
     invoke(lambda: finish_move(pivot), delay=0.2)
 
 # HAUT
-def mouv_U():
+def mouv_U(direction):
     global is_animating, move_queue
     if is_animating:
-        move_queue.append('U')
+        move_queue.append(('U', direction))
         return
     is_animating = True
 
@@ -93,15 +93,15 @@ def mouv_U():
 
     pivot.position = (0, 0, 0)
 
-    pivot.animate_rotation_y(90, duration=0.2, curve=curve.linear)
+    pivot.animate_rotation_y(90 * direction, duration=0.2, curve=curve.linear)
 
     invoke(lambda: finish_move(pivot), delay=0.2)
 
 # ARRIÈRE
-def mouv_B():
+def mouv_B(direction):
     global is_animating, move_queue
     if is_animating:
-        move_queue.append('B')
+        move_queue.append(('B', direction))
         return
     is_animating = True
 
@@ -113,15 +113,15 @@ def mouv_B():
 
     pivot.position = (0, 0, 0)
 
-    pivot.animate_rotation_z(-90, duration=0.2, curve=curve.linear)
+    pivot.animate_rotation_z(-90 * direction, duration=0.2, curve=curve.linear)
 
     invoke(lambda: finish_move(pivot), delay=0.2)
 
 # GAUCHE
-def mouv_L():
+def mouv_L(direction):
     global is_animating, move_queue
     if is_animating:
-        move_queue.append('L')
+        move_queue.append(('L', direction))
         return
     is_animating = True
 
@@ -133,15 +133,15 @@ def mouv_L():
 
     pivot.position = (0, 0, 0)
 
-    pivot.animate_rotation_x(-90, duration=0.2, curve=curve.linear)
+    pivot.animate_rotation_x(-90 * direction, duration=0.2, curve=curve.linear)
 
     invoke(lambda: finish_move(pivot), delay=0.2)
 
 # BAS
-def mouv_D():
+def mouv_D(direction):
     global is_animating, move_queue
     if is_animating:
-        move_queue.append('D')
+        move_queue.append(('D', direction))
         return
     is_animating = True
 
@@ -153,6 +153,6 @@ def mouv_D():
 
     pivot.position = (0, 0, 0)
 
-    pivot.animate_rotation_y(-90, duration=0.2, curve=curve.linear)
+    pivot.animate_rotation_y(-90 * direction, duration=0.2, curve=curve.linear)
 
     invoke(lambda: finish_move(pivot), delay=0.2)

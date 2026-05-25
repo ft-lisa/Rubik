@@ -5,6 +5,8 @@ from cube.cube import cube_group
 
 dragging = False
 last_mouse_pos = Vec2(0, 0)
+CLOCKWISE = 1
+COUNTERCLOCKWISE = -1
 
 
 def input(key):
@@ -18,17 +20,30 @@ def input(key):
         dragging = False
     
     if key == 'r':
-        cube.mouv_R()
+        cube.mouv_R(CLOCKWISE)
     elif key == 'l':
-        cube.mouv_L()
+        cube.mouv_L(CLOCKWISE)
     elif key == 'u':
-        cube.mouv_U()
+        cube.mouv_U(CLOCKWISE)
     elif key == 'd':
-        cube.mouv_D()
+        cube.mouv_D(CLOCKWISE)
     elif key == 'f':
-        cube.mouv_F()
+        cube.mouv_F(CLOCKWISE)
     elif key == 'b':
-        cube.mouv_B()
+        cube.mouv_B(CLOCKWISE)
+    elif key == 't':
+        cube.mouv_R(COUNTERCLOCKWISE)
+    elif key == ';':
+        cube.mouv_L(COUNTERCLOCKWISE)
+    elif key == 'i':
+        cube.mouv_U(COUNTERCLOCKWISE)
+    elif key == 's':
+        cube.mouv_D(COUNTERCLOCKWISE)
+    elif key == 'g':
+        cube.mouv_F(COUNTERCLOCKWISE)
+    elif key == 'n':
+        cube.mouv_B(COUNTERCLOCKWISE)
+
 
 def update():
     global last_mouse_pos
