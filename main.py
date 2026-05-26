@@ -1,16 +1,25 @@
 from ursina import *
+import sys
 import cube.cube as cube
 import cube.controls as controls
+from parsing import parse_moves, mix_cube
+# sys.argv[1]
 
-app = Ursina()
+if len(sys.argv) > 1:
+    app = Ursina()
+    sequence = sys.argv[1]
+    moves = sequence.split(' ')
 
-cube.create_cube()
+    if (parse_moves(moves)):
 
-def input(key):
-    controls.input(key)
+        cube.create_cube()
+        
 
-def update():
-    controls.update()
+        def input(key):
+            controls.input(key)
 
-app.run()
+        def update():
+            controls.update()
+        mix_cube(moves)
+        app.run()
 
