@@ -3,6 +3,7 @@ import argparse
 import srcs.cube as cube
 import srcs.controls as controls
 from srcs.parsing import parse_moves, mix_cube
+import sys
 
 
 def get_args() -> tuple[argparse.Namespace, argparse.ArgumentParser]:
@@ -10,16 +11,33 @@ def get_args() -> tuple[argparse.Namespace, argparse.ArgumentParser]:
     parser.add_argument(
         "--moves",
         type=str,
-        required=True,
+        required=False,
         metavar="N",
         help="Sequence of moves (e.g. \"R U R' U'\")",
+    )
+    parser.add_argument(
+        "--hands-on",
+        action="store_true",
+        help="Enable hands-on mode for interactive cube manipulation",
     )
     return parser.parse_args(), parser
 
 
 def check_args(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
-    if not args.moves:
-        parser.error("You must provide a sequence of moves using --moves")
+    if not args.moves and not args.hands_on:
+        parser.error("At least one of --moves or --hands-on must be provided.")
+
+
+def input(key):
+    controls.input(key)
+
+
+def update():
+    controls.update()
+
+
+sys.modules["__main__"].input = input
+sys.modules["__main__"].update = update
 
 
 def apply_moves(moves):
@@ -27,15 +45,7 @@ def apply_moves(moves):
 
     if parse_moves(moves):
         app = Ursina()
-
         cube.create_cube()
-
-        def input(key):
-            controls.input(key)
-
-        def update():
-            controls.update()
-
         mix_cube(moves)
         app.run()
     else:
@@ -45,11 +55,20 @@ def apply_moves(moves):
         )
 
 
+def apply_hands_on(moves):
+    app = Ursina()
+    cube.create_cube()
+    app.run()
+
+
 def main():
     args, parser = get_args()
     try:
         check_args(args, parser)
-        apply_moves(args.moves)
+        if args.hands_on:
+            apply_hands_on(args.hands_on)
+        else:
+            apply_moves(args.moves)
     except (ValueError, AssertionError) as error:
         print(type(error).__name__ + ":", error)
 
