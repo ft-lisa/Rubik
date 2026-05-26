@@ -17,8 +17,6 @@ def mix_cube(moves):
 
         parsed_moves[face] = direction
 
-    print("Parsed moves:", parsed_moves)
-
     for face, direction in parsed_moves.items():
         rMoves.do_move(face, direction)
 
