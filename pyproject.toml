@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "argparse>=1.4.0",
     "flake8>=7.3.0",
     "ursina>=8.3.0",
 ]
@@ -22,5 +23,5 @@ packages = ["srcs"]
 
 [dependency-groups]
 dev = [
-    "pre-commit>=4.6.0",
+    "flake8>=7.3.0",
 ]

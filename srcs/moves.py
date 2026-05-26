@@ -17,8 +17,7 @@ class Moves:
         self.is_animating = False
         self.move_queue = []
 
-    @staticmethod
-    def snap_cube(cube):
+    def snap_cube(self, cube):
         # snap position to integer grid
         cube.x = round(cube.x)
         cube.y = round(cube.y)
@@ -83,4 +82,4 @@ class Moves:
         self.do_move("B", direction)
 
 
-moves = Moves()
+rMoves = Moves()

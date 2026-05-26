@@ -1,5 +1,5 @@
 from ursina import Vec2, mouse
-from srcs.moves import moves
+from srcs.moves import rMoves
 from srcs.cube import cube_group
 
 dragging = False
@@ -19,29 +19,29 @@ def input(key):
         dragging = False
 
     if key == "r":
-        moves.mouv_R(CLOCKWISE)
+        rMoves.mouv_R(CLOCKWISE)
     elif key == "l":
-        moves.mouv_L(CLOCKWISE)
+        rMoves.mouv_L(CLOCKWISE)
     elif key == "u":
-        moves.mouv_U(CLOCKWISE)
+        rMoves.mouv_U(CLOCKWISE)
     elif key == "d":
-        moves.mouv_D(CLOCKWISE)
+        rMoves.mouv_D(CLOCKWISE)
     elif key == "f":
-        moves.mouv_F(CLOCKWISE)
+        rMoves.mouv_F(CLOCKWISE)
     elif key == "b":
-        moves.mouv_B(CLOCKWISE)
+        rMoves.mouv_B(CLOCKWISE)
     elif key == "t":
-        moves.mouv_R(COUNTERCLOCKWISE)
+        rMoves.mouv_R(COUNTERCLOCKWISE)
     elif key == ";":
-        moves.mouv_L(COUNTERCLOCKWISE)
+        rMoves.mouv_L(COUNTERCLOCKWISE)
     elif key == "i":
-        moves.mouv_U(COUNTERCLOCKWISE)
+        rMoves.mouv_U(COUNTERCLOCKWISE)
     elif key == "s":
-        moves.mouv_D(COUNTERCLOCKWISE)
+        rMoves.mouv_D(COUNTERCLOCKWISE)
     elif key == "g":
-        moves.mouv_F(COUNTERCLOCKWISE)
+        rMoves.mouv_F(COUNTERCLOCKWISE)
     elif key == "n":
-        moves.mouv_B(COUNTERCLOCKWISE)
+        rMoves.mouv_B(COUNTERCLOCKWISE)
 
 
 def update():

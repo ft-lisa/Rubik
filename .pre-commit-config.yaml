@@ -1,9 +1,0 @@
-repos:
-  - repo: local
-    hooks:
-      - id: flake8
-        name: flake8 (uv)
-        entry: uv run flake8 srcs/
-        language: system
-        pass_filenames: false
-        always_run: true
