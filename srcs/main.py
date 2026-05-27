@@ -3,6 +3,7 @@ import argparse
 import srcs.cube as cube
 import srcs.controls as controls
 from srcs.parsing import parse_moves, mix_cube
+from srcs.cubie import rubik
 import sys
 
 
@@ -47,6 +48,7 @@ def apply_moves(moves):
         app = Ursina()
         cube.create_cube()
         mix_cube(moves)
+        rubik.resolve_cube(moves)
         app.run()
     else:
         raise ValueError(
@@ -55,7 +57,7 @@ def apply_moves(moves):
         )
 
 
-def apply_hands_on(moves):
+def apply_hands_on():
     app = Ursina()
     cube.create_cube()
     app.run()
@@ -66,7 +68,7 @@ def main():
     try:
         check_args(args, parser)
         if args.hands_on:
-            apply_hands_on(args.hands_on)
+            apply_hands_on()
         else:
             apply_moves(args.moves)
     except (ValueError, AssertionError) as error:

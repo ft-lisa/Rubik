@@ -22,7 +22,7 @@ def mix_cube(moves):
 
 
 def parse_moves(moves):
-    valid_faces = {"F", "R", "U", "B", "L", "D"}
+    valid_moves = {"F", "R", "U", "B", "L", "D"}
     valid_modifiers = {"'", "2"}
 
     for move in moves:
@@ -32,7 +32,7 @@ def parse_moves(moves):
             return False
 
         # Première lettre
-        if move[0] not in valid_faces:
+        if move[0] not in valid_moves:
             return False
 
         # Deuxième caractère si présent
