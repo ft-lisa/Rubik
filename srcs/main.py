@@ -4,6 +4,7 @@ import srcs.cube as cube
 import srcs.controls as controls
 from srcs.parsing import parse_moves, mix_cube
 from srcs.cubie import rubik
+from srcs.bfs import bfs
 import sys
 
 
@@ -21,12 +22,19 @@ def get_args() -> tuple[argparse.Namespace, argparse.ArgumentParser]:
         action="store_true",
         help="Enable hands-on mode for interactive cube manipulation",
     )
+    parser.add_argument(
+        "--calculate-heuristic",
+        action="store_true",
+        help="Calculate heuristic database for the Rubik's cube",
+    )
     return parser.parse_args(), parser
 
 
 def check_args(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
-    if not args.moves and not args.hands_on:
-        parser.error("At least one of --moves or --hands-on must be provided.")
+    if not args.moves and not args.hands_on and not args.calculate_heuristic:
+        parser.error(
+            "At least one of --moves, --hands-on, or --calculate-heuristic must be provided."
+        )
 
 
 def input(key):
@@ -69,7 +77,9 @@ def main():
         check_args(args, parser)
         if args.hands_on:
             apply_hands_on()
-        else:
+        elif args.calculate_heuristic:
+            bfs.calculate_heuristic()
+        elif args.moves:
             apply_moves(args.moves)
     except (ValueError, AssertionError) as error:
         print(type(error).__name__ + ":", error)
