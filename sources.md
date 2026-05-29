@@ -13,3 +13,7 @@ https://youtu.be/qns1vvi0WVo?is=1G5JPqNvIbRA8Mlw
 
 # BFS 
 https://www.geeksforgeeks.org/python/python-program-for-breadth-first-search-or-bfs-for-a-graph/
+
+
+# IDA 
+https://www.geeksforgeeks.org/artificial-intelligence iterative-deepening-a-algorithm-ida-artificial-intelligence/

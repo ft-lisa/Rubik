@@ -1,5 +1,5 @@
-from srcs.cube import cubes
 import numpy as np
+from srcs.parsing import REVERSE_MODIFIERS
 
 
 class Rubik:
@@ -19,6 +19,12 @@ class Rubik:
             ("L", -1),
             ("D", 1),
             ("D", -1),
+            ("F2", 1),
+            ("B2", 1),
+            ("L2", 1),
+            ("R2", 1),
+            ("U2", 1),
+            ("D2", 1),
         ]
 
         self.COULEURS_UD = {"W", "Y"}
@@ -36,6 +42,7 @@ class Rubik:
             ("F", "R"),
             ("F", "L"),
             ("B", "R"),
+            ("B", "L"),
         ]
 
         self.CORNERS = [
@@ -51,6 +58,12 @@ class Rubik:
         self.initialize_cube()
 
         self.size = 3
+
+    def solved(self) -> bool:
+        for face in self.rubik:
+            if not np.all(face == face[0, 0]):
+                return False
+        return True
 
     def initialize_cube(self) -> None:
         self.front = self.fill_grid(self.colors[0])
@@ -71,20 +84,25 @@ class Rubik:
                 face[row, col] = color
         return face
 
-    def resolve_cube(self, moves: list[str]) -> None:
+    def shuffle_rubik(self, moves: list[str]) -> None:
+
         for move in moves:
-            face = move[0]
             direction = 1
 
             if len(move) > 1:
-                if move[1] == "'":
+                if move[1] in REVERSE_MODIFIERS:
                     direction = -1
-                elif move[1] == "2":
-                    self.rotate_face(face, direction)
-                    self.rotate_face(face, direction)
-                    continue
+                move = move[0]
 
-            self.rotate_face(face, direction)
+            self.rotate_face(move, direction)
+
+        print("-" * 30)
+        print("front:\n", self.front)
+        print("back:\n", self.back)
+        print("upper:\n", self.upper)
+        print("down:\n", self.down)
+        print("right:\n", self.right)
+        print("left:\n", self.left)
 
     def update_rubik(self) -> None:
         self.rubik = np.array(
@@ -117,7 +135,7 @@ class Rubik:
 
         self.update_rubik()
 
-    def rotate_F(self, direction: int) -> None:
+    def rotate_F(self, direction):
         if direction == 1:
             self.front = np.rot90(self.front, -1)
 
@@ -135,26 +153,26 @@ class Rubik:
             self.down[0, :] = self.left[:, 2]
             self.left[:, 2] = tmp
 
-    def rotate_R(self, direction: int) -> None:
+    def rotate_R(self, direction):
         if direction == 1:
             self.right = np.rot90(self.right, -1)
 
             tmp = self.upper[:, 2].copy()
             self.upper[:, 2] = self.front[:, 2]
             self.front[:, 2] = self.down[:, 2]
-            self.down[:, 2] = self.back[:, 0]
-            self.back[:, 0] = tmp
+            self.down[:, 2] = self.back[::-1, 0]
+            self.back[:, 0] = tmp[::-1]
 
         else:
             self.right = np.rot90(self.right, 1)
 
             tmp = self.upper[:, 2].copy()
-            self.upper[:, 2] = self.back[:, 0]
-            self.back[:, 0] = self.down[:, 2]
+            self.upper[:, 2] = self.back[::-1, 0]
+            self.back[:, 0] = self.down[::-1, 2]
             self.down[:, 2] = self.front[:, 2]
             self.front[:, 2] = tmp
 
-    def rotate_U(self, direction: int) -> None:
+    def rotate_U(self, direction):
         if direction == 1:
             self.upper = np.rot90(self.upper, -1)
 
@@ -172,25 +190,25 @@ class Rubik:
             self.back[0, :] = self.right[0, :]
             self.right[0, :] = tmp
 
-    def rotate_B(self, direction: int) -> None:
+    def rotate_B(self, direction):
         if direction == 1:
             self.back = np.rot90(self.back, -1)
 
-            tmp = self.down[2, :].copy()
-            self.down[2, :] = self.left[:, 0]
-            self.left[:, 0] = self.upper[0, :]
+            tmp = self.upper[0, :].copy()
             self.upper[0, :] = self.right[:, 2]
-            self.right[:, 2] = tmp
+            self.right[:, 2] = self.down[2, ::-1]
+            self.down[2, :] = self.left[:, 0]
+            self.left[:, 0] = tmp[::-1]
         else:
             self.back = np.rot90(self.back, 1)
 
-            tmp = self.left[0, :].copy()
-            self.left[0, :] = self.down[2, :]
-            self.down[2, :] = self.right[2, :]
-            self.right[2, :] = self.upper[0, :]
-            self.upper[0, :] = tmp
+            tmp = self.upper[0, :].copy()
+            self.upper[0, :] = self.left[::-1, 0]
+            self.left[:, 0] = self.down[2, :]
+            self.down[2, :] = self.right[::-1, 2]
+            self.right[:, 2] = tmp
 
-    def rotate_L(self, direction: int) -> None:
+    def rotate_L(self, direction):
         if direction == 1:
             self.left = np.rot90(self.left, -1)
 
@@ -208,7 +226,7 @@ class Rubik:
             self.upper[:, 0] = self.front[:, 0]
             self.front[:, 0] = tmp
 
-    def rotate_D(self, direction: int) -> None:
+    def rotate_D(self, direction):
         if direction == 1:
             self.down = np.rot90(self.down, -1)
 

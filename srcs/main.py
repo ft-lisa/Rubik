@@ -3,8 +3,9 @@ import argparse
 import srcs.cube as cube
 import srcs.controls as controls
 from srcs.parsing import parse_moves, mix_cube
-from srcs.cubie import rubik
+from srcs.rubik import rubik
 from srcs.bfs import bfs
+from srcs.ida import ida
 import sys
 
 
@@ -50,14 +51,17 @@ sys.modules["__main__"].update = update
 
 
 def apply_moves(moves):
-    moves = moves.split(" ")
+    moves = moves.strip().split()
 
-    if parse_moves(moves):
+    is_valid, real_moves = parse_moves(moves)
+    if is_valid:
         app = Ursina()
         cube.create_cube()
-        mix_cube(moves)
-        rubik.resolve_cube(moves)
-        app.run()
+        mix_cube(real_moves)
+        rubik.shuffle_rubik(real_moves)
+        moves = ida.run()
+        print("Moves to solve the cube:", moves)
+        # app.run()
     else:
         raise ValueError(
             "Invalid move sequence. Moves must be in the format: "
