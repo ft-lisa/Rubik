@@ -19,12 +19,6 @@ class Rubik:
             ("L", -1),
             ("D", 1),
             ("D", -1),
-            ("F2", 1),
-            ("B2", 1),
-            ("L2", 1),
-            ("R2", 1),
-            ("U2", 1),
-            ("D2", 1),
         ]
 
         self.COULEURS_UD = {"W", "Y"}
@@ -96,14 +90,6 @@ class Rubik:
 
             self.rotate_face(move, direction)
 
-        print("-" * 30)
-        print("front:\n", self.front)
-        print("back:\n", self.back)
-        print("upper:\n", self.upper)
-        print("down:\n", self.down)
-        print("right:\n", self.right)
-        print("left:\n", self.left)
-
     def update_rubik(self) -> None:
         self.rubik = np.array(
             [self.front, self.back, self.right, self.left, self.upper, self.down]
@@ -140,18 +126,18 @@ class Rubik:
             self.front = np.rot90(self.front, -1)
 
             tmp = self.upper[2, :].copy()
-            self.upper[2, :] = self.left[:, 2]
+            self.upper[2, :] = self.left[::-1, 2]
             self.left[:, 2] = self.down[0, :]
-            self.down[0, :] = self.right[:, 0]
+            self.down[0, :] = self.right[::-1, 0]
             self.right[:, 0] = tmp
         else:
             self.front = np.rot90(self.front, 1)
 
             tmp = self.upper[2, :].copy()
             self.upper[2, :] = self.right[:, 0]
-            self.right[:, 0] = self.down[0, :]
+            self.right[:, 0] = self.down[0, ::-1]
             self.down[0, :] = self.left[:, 2]
-            self.left[:, 2] = tmp
+            self.left[:, 2] = tmp[::-1]
 
     def rotate_R(self, direction):
         if direction == 1:
@@ -283,7 +269,7 @@ class Rubik:
 
     def get_edges_binary(self) -> list[int]:
         ori_coord = []
-        for _, emplacement in enumerate(self.ARETES):
+        for _, emplacement in enumerate(self.ARETES[:11]):
             stickers = self.read_edge(emplacement)
             ori = self.get_edge_orientation(stickers)
             ori_coord.append(ori)
@@ -322,7 +308,7 @@ class Rubik:
 
     def get_corners_binary(self) -> list[int]:
         corners_coord = []
-        for _, emplacement in enumerate(self.CORNERS):
+        for _, emplacement in enumerate(self.CORNERS[:7]):
             stickers = self.read_corner(emplacement)
             ori = self.get_corner_orientation(stickers)
             corners_coord.append(ori)
