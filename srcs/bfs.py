@@ -1,5 +1,4 @@
 from srcs.rubik import rubik
-from tqdm import tqdm
 
 
 class BFS:
@@ -7,82 +6,89 @@ class BFS:
     def __init__(self):
         self.visited_edges = {}
         self.visited_corners = {}
-        self.max_moves = 20
+        self.max_depth = 20
+
+    def apply_edge_move(self, state, move):
+        perm = rubik.move_ep[move]
+        flip = rubik.move_eo[move]
+
+        new_eo = [0] * 12
+
+        # permutation des positions
+        for i in range(12):
+            src = perm[i]
+
+            # l'orientation de la nouvelle arête à la position i vient de l'arête à src
+            # plus le flip créé par le mouvement à cette position
+            new_eo[i] = state[src] ^ flip[i]
+
+        return tuple(new_eo)
 
     def build_edges_heuristic(
         self,
-        state: str,
-        actions: list[tuple[str, int]],
     ) -> dict:
-        initial_eo = "".join(map(str, rubik.get_edges_binary()))
-        self.visited_edges = {initial_eo: 0}
-        visited_states = {state}
-        queue = [(state, 0)]
 
-        with tqdm(desc="Heuristic DB") as pbar:
-            while queue:
-                state, depth = queue.pop(0)
-                if depth >= self.max_moves:
-                    continue
+        start_eo = tuple([0] * 12)
 
-                for action, direction in actions:
-                    rubik.set_rubik_from_string(state)
-                    rubik.rotate_face(action, direction)
+        queue = [(start_eo, 0)]
 
-                    next_state = "".join(rubik.rubik.flatten())
-                    if next_state not in visited_states:
-                        eo_key = "".join(map(str, rubik.get_edges_binary()))
-                        if (
-                            eo_key not in self.visited_edges
-                            or self.visited_edges[eo_key] > depth + 1
-                        ):
-                            self.visited_edges[eo_key] = depth + 1
-                            queue.append((next_state, depth + 1))
-                            visited_states.add(next_state)
-                    pbar.update(1)
+        self.visited_edges[start_eo] = 0
+
+        while queue:
+            state, depth = queue.pop(0)
+
+            if depth >= self.max_depth:
+                continue
+
+            for move in rubik.moves:
+                new_eo = self.apply_edge_move(state, move)
+
+                if new_eo not in self.visited_edges:
+                    self.visited_edges[new_eo] = depth + 1
+                    queue.append((new_eo, depth + 1))
+
+    def apply_corner_move(self, state, move):
+        perm = rubik.move_cp[move]
+        twist = rubik.move_co[move]
+
+        new_co = [0] * 8
+
+        # permutation des positions
+        for i in range(8):
+            src = perm[i]
+
+            # l'orientation du nouveau coin à la position i vient du coin à src
+            # plus le twist créé par le mouvement à cette position
+            new_co[i] = (state[src] + twist[i]) % 3
+
+        return tuple(new_co)
 
     def build_corner_heuristic(
         self,
-        state: str,
-        actions: list[tuple[str, int]],
     ) -> dict:
-        initial_eo = "".join(map(str, rubik.get_edges_binary()))
-        visited_states = {state}
-        self.visited_corners = {initial_eo: 0}
-        queue = [(state, 0)]
 
-        with tqdm(desc="Heuristic DB") as pbar:
-            while queue:
-                state, depth = queue.pop(0)
-                if depth >= self.max_moves:
-                    continue
+        start_co = tuple([0] * 8)
 
-                for action, direction in actions:
-                    rubik.set_rubik_from_string(state)
-                    rubik.rotate_face(action, direction)
+        queue = [(start_co, 0)]
 
-                    next_state = "".join(rubik.rubik.flatten())
-                    co_key = "".join(map(str, rubik.get_corners_binary()))
+        self.visited_corners[start_co] = 0
 
-                    if next_state not in visited_states:
-                        co_key = "".join(map(str, rubik.get_corners_binary()))
-                        if (
-                            co_key not in self.visited_corners
-                            or self.visited_corners[co_key] > depth + 1
-                        ):
-                            self.visited_corners[co_key] = depth + 1
-                            queue.append((next_state, depth + 1))
-                            visited_states.add(next_state)
+        while queue:
+            state, depth = queue.pop(0)
 
-                    pbar.update(1)
+            if depth >= self.max_depth:
+                continue
+
+            for move in rubik.moves:
+                new_co = self.apply_corner_move(state, move)
+
+                if new_co not in self.visited_corners:
+                    self.visited_corners[new_co] = depth + 1
+                    queue.append((new_co, depth + 1))
 
     def calculate_heuristic(self):
-        rubik.initialize_cube()
-        self.build_edges_heuristic("".join(rubik.rubik.flatten()), rubik.actions)
-        self.build_corner_heuristic("".join(rubik.rubik.flatten()), rubik.actions)
-
-        print(len(self.visited_edges))
-        print(len(self.visited_corners))
+        self.build_edges_heuristic()
+        self.build_corner_heuristic()
 
 
 bfs = BFS()

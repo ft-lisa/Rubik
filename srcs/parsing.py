@@ -5,17 +5,22 @@ DOUBLE_MODIFIERS = {"2"}
 VALID_MOVES = {"F", "R", "U", "B", "L", "D"}
 
 
+def determine_move(move: str) -> tuple[str, int]:
+    direction = 1
+
+    if len(move) > 1:
+        if move[1] in REVERSE_MODIFIERS:
+            direction = -1
+        move = move[0]
+
+    return move, direction
+
+
 def mix_cube(moves):
     parsed_moves = {}
 
     for move in moves:
-        direction = 1
-
-        if len(move) > 1:
-            if move[1] in REVERSE_MODIFIERS:
-                direction = -1
-            move = move[0]
-
+        move, direction = determine_move(move)
         parsed_moves[move] = direction
 
     for move, direction in parsed_moves.items():

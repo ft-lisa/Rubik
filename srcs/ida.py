@@ -4,64 +4,50 @@ from srcs.bfs import bfs
 
 class IDA_STAR:
 
-    def __init__(self, max_depth=20):
+    def __init__(self):
         self.moves = []
-        self.threshold = 20
+        self.threshold = None
         self.min_threshold = None
+        self.max_depth = 20
 
-    def run(self) -> list[tuple[str, int]]:
-        state = "".join(rubik.rubik.flatten())
-        rubik.set_rubik_from_string(state)
+    def run(self) -> list[str]:
 
-        print("state:", state)
+        eo_key = rubik.get_edges_binary()
+        co_key = rubik.get_corners_binary()
 
-        # while True:
-        #     self.min_threshold = float("inf")
-        #     status = self.search(state, 1)
-        #     if status == -1:
-        #         return self.moves
-        #     self.moves = []
-        #     self.threshold = self.min_threshold
+        self.threshold = max(bfs.visited_edges[eo_key], bfs.visited_corners[co_key])
 
-    def search(self, state: str, g_score: int) -> int:
-        rubik.set_rubik_from_string(state)
-        if (
-            rubik.get_edges_binary() == [0] * 11
-            and rubik.get_corners_binary() == [0] * 7
-        ):
-            return -1
-        # elif len(self.moves) >= self.threshold:
-        #     return False
+        while True:
+            self.min_threshold = float("inf")
+            status = self.search(0, eo_key, co_key)
+            if status:
+                return self.moves
+            self.moves = []
+            self.threshold = self.min_threshold
 
-        eo_key = "".join(map(str, rubik.get_edges_binary()))
-        co_key = "".join(map(str, rubik.get_corners_binary()))
+    def search(self, g_score: int, eo_key: tuple[int], co_key: tuple[int]) -> bool:
 
-        h_score = max(bfs.visited_edges[eo_key], bfs.visited_corners[co_key])
+        for move in rubik.moves:
+            new_eo = bfs.apply_edge_move(eo_key, move)
+            new_co = bfs.apply_corner_move(co_key, move)
 
-        f_score = g_score + h_score
+            h_score = max(bfs.visited_edges[new_eo], bfs.visited_corners[new_co])
+            if h_score == 0:
+                self.moves.append(move)
+                return True
 
-        if f_score > self.threshold:
-            return f_score
+            f_score = g_score + h_score
+            if f_score > self.threshold:
+                self.min_threshold = min(self.min_threshold, f_score)
+                continue
 
-        if h_score == 0:
-            return -1
-
-        for action, direction in rubik.actions:
-            rubik.set_rubik_from_string(state)
-            rubik.rotate_face(action, direction)
-
-            self.moves.append([action, direction])
-
-            next_state = "".join(rubik.rubik.flatten())
-            result = self.search(next_state, g_score + 1)
-            if result == -1:
-                return -1
-
-            self.min_threshold = min(self.min_threshold, result)
+            self.moves.append(move)
+            if self.search(g_score + 1, new_eo, new_co):
+                return True
 
             self.moves.pop()
 
-        return self.min_threshold
+        return False
 
 
 ida = IDA_STAR()

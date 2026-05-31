@@ -23,19 +23,12 @@ def get_args() -> tuple[argparse.Namespace, argparse.ArgumentParser]:
         action="store_true",
         help="Enable hands-on mode for interactive cube manipulation",
     )
-    parser.add_argument(
-        "--calculate-heuristic",
-        action="store_true",
-        help="Calculate heuristic database for the Rubik's cube",
-    )
     return parser.parse_args(), parser
 
 
 def check_args(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
-    if not args.moves and not args.hands_on and not args.calculate_heuristic:
-        parser.error(
-            "At least one of --moves, --hands-on, or --calculate-heuristic must be provided."
-        )
+    if not args.moves and not args.hands_on:
+        parser.error("At least one of --moves or --hands-on must be provided.")
 
 
 def input(key):
@@ -59,9 +52,12 @@ def apply_moves(moves):
         cube.create_cube()
         mix_cube(real_moves)
         rubik.shuffle_rubik(real_moves)
+
+        bfs.calculate_heuristic()
+
         moves = ida.run()
         print("Moves to solve the cube:", moves)
-        # app.run()
+        app.run()
     else:
         raise ValueError(
             "Invalid move sequence. Moves must be in the format: "
@@ -81,8 +77,6 @@ def main():
         check_args(args, parser)
         if args.hands_on:
             apply_hands_on()
-        elif args.calculate_heuristic:
-            bfs.calculate_heuristic()
         elif args.moves:
             apply_moves(args.moves)
     except (ValueError, AssertionError) as error:

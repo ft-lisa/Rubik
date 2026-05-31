@@ -1,63 +1,116 @@
 import numpy as np
-from srcs.parsing import REVERSE_MODIFIERS
+from srcs.parsing import determine_move
 
 
 class Rubik:
 
     def __init__(self):
         self.colors = ["G", "B", "R", "O", "W", "Y"]
-        self.actions = [
-            ("F", 1),
-            ("F", -1),
-            ("R", 1),
-            ("R", -1),
-            ("U", 1),
-            ("U", -1),
-            ("B", 1),
-            ("B", -1),
-            ("L", 1),
-            ("L", -1),
-            ("D", 1),
-            ("D", -1),
+        self.moves = [
+            "F",
+            "F'",
+            "R",
+            "R'",
+            "U",
+            "U'",
+            "B",
+            "B'",
+            "L",
+            "L'",
+            "D",
+            "D'",
         ]
 
+        self.move_eo = {
+            "U": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "D": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "R": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "L": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "F": [0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0],
+            "B": [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1],
+            "U'": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "D'": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "R'": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "L'": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "F'": [0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0],
+            "B'": [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1],
+        }
+
+        self.move_ep = {
+            "U": [3, 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11],
+            "D": [0, 1, 2, 3, 5, 6, 7, 4, 8, 9, 10, 11],
+            "R": [8, 1, 2, 3, 11, 5, 6, 7, 4, 9, 10, 0],
+            "L": [0, 1, 10, 3, 4, 5, 9, 7, 8, 2, 6, 11],
+            "F": [0, 9, 2, 3, 4, 8, 6, 7, 1, 5, 10, 11],
+            "B": [0, 1, 2, 11, 4, 5, 6, 10, 8, 9, 3, 7],
+            "U'": [1, 2, 3, 0, 4, 5, 6, 7, 8, 9, 10, 11],
+            "D'": [0, 1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11],
+            "R'": [11, 1, 2, 3, 8, 5, 6, 7, 0, 9, 10, 4],
+            "L'": [0, 1, 9, 3, 4, 5, 10, 7, 8, 6, 2, 11],
+            "F'": [0, 8, 2, 3, 4, 9, 6, 7, 5, 1, 10, 11],
+            "B'": [0, 1, 2, 10, 4, 5, 6, 11, 8, 9, 7, 3],
+        }
+
+        self.move_co = {
+            "U": [0, 0, 0, 0, 0, 0, 0, 0],
+            "D": [0, 0, 0, 0, 0, 0, 0, 0],
+            "R": [2, 1, 0, 0, 1, 2, 0, 0],
+            "L": [0, 0, 2, 1, 0, 0, 1, 2],
+            "F": [0, 2, 1, 0, 0, 1, 2, 0],
+            "B": [1, 0, 0, 2, 2, 0, 0, 1],
+            "U'": [0, 0, 0, 0, 0, 0, 0, 0],
+            "D'": [0, 0, 0, 0, 0, 0, 0, 0],
+            "R'": [2, 1, 0, 0, 1, 2, 0, 0],
+            "L'": [0, 0, 2, 1, 0, 0, 1, 2],
+            "F'": [0, 2, 1, 0, 0, 1, 2, 0],
+            "B'": [1, 0, 0, 2, 2, 0, 0, 1],
+        }
+
+        self.move_cp = {
+            "U": [3, 0, 1, 2, 4, 5, 6, 7],
+            "D": [0, 1, 2, 3, 5, 6, 7, 4],
+            "R": [1, 5, 2, 3, 0, 4, 6, 7],
+            "L": [0, 1, 3, 7, 4, 5, 2, 6],
+            "F": [0, 2, 6, 3, 4, 1, 5, 7],
+            "B": [4, 1, 2, 0, 7, 5, 6, 3],
+            "U'": [1, 2, 3, 0, 4, 5, 6, 7],
+            "D'": [0, 1, 2, 3, 7, 4, 5, 6],
+            "R'": [4, 0, 2, 3, 5, 1, 6, 7],
+            "L'": [0, 1, 6, 2, 4, 5, 7, 3],
+            "F'": [0, 5, 1, 3, 4, 6, 2, 7],
+            "B'": [3, 1, 2, 7, 0, 5, 6, 4],
+        }
+
         self.COULEURS_UD = {"W", "Y"}
-        self.COULEURS_FB = {"G", "B"}
+        self.COULEURS_LR = {"O", "R"}
 
         self.ARETES = [
-            ("U", "F"),
             ("U", "R"),
-            ("U", "B"),
+            ("U", "F"),
             ("U", "L"),
-            ("D", "F"),
+            ("U", "B"),
             ("D", "R"),
-            ("D", "B"),
+            ("D", "F"),
             ("D", "L"),
+            ("D", "B"),
             ("F", "R"),
             ("F", "L"),
-            ("B", "R"),
             ("B", "L"),
+            ("B", "R"),
         ]
 
         self.CORNERS = [
-            ("U", "R", "F"),
-            ("U", "F", "L"),
-            ("U", "L", "B"),
-            ("U", "B", "R"),
+            ("U", "R", "B"),
+            ("U", "F", "R"),
+            ("U", "L", "F"),
+            ("U", "B", "L"),
+            ("D", "R", "B"),
             ("D", "F", "R"),
             ("D", "L", "F"),
             ("D", "B", "L"),
         ]
 
         self.initialize_cube()
-
-        self.size = 3
-
-    def solved(self) -> bool:
-        for face in self.rubik:
-            if not np.all(face == face[0, 0]):
-                return False
-        return True
 
     def initialize_cube(self) -> None:
         self.front = self.fill_grid(self.colors[0])
@@ -79,14 +132,8 @@ class Rubik:
         return face
 
     def shuffle_rubik(self, moves: list[str]) -> None:
-
         for move in moves:
-            direction = 1
-
-            if len(move) > 1:
-                if move[1] in REVERSE_MODIFIERS:
-                    direction = -1
-                move = move[0]
+            move, direction = determine_move(move)
 
             self.rotate_face(move, direction)
 
@@ -231,87 +278,82 @@ class Rubik:
             self.back[2, :] = self.left[2, :]
             self.left[2, :] = tmp
 
-    def get_edge_orientation(self, stickers: dict[str, str]) -> int:
-        face_ref, _ = stickers.keys()
-        couleur_ref = stickers[face_ref]
+    def get_edge_orientation(self, stickers_colors: tuple[str, str]) -> int:
+        first_color, second_color = stickers_colors
 
-        if face_ref in ("U", "D"):
-            return 0 if couleur_ref in self.COULEURS_UD else 1
+        return (
+            1
+            if first_color in self.COULEURS_LR or second_color in self.COULEURS_UD
+            else 0
+        )
 
-        return 0 if couleur_ref in self.COULEURS_FB else 1
-
-    def read_edge(self, emplacement: tuple[str, str]) -> dict[str, str]:
+    def read_edge(self, emplacement: tuple[str, str]) -> tuple[str, str]:
         face1, face2 = emplacement
-        if face1 == "U" and face2 == "F":
-            return {"U": self.upper[2, 1], "F": self.front[0, 1]}
-        elif face1 == "U" and face2 == "R":
-            return {"U": self.upper[1, 2], "R": self.right[0, 1]}
-        elif face1 == "U" and face2 == "B":
-            return {"U": self.upper[0, 1], "B": self.back[0, 1]}
+        if face1 == "U" and face2 == "R":
+            return (self.upper[1, 2], self.right[0, 1])
+        elif face1 == "U" and face2 == "F":
+            return (self.upper[2, 1], self.front[0, 1])
         elif face1 == "U" and face2 == "L":
-            return {"U": self.upper[1, 0], "L": self.left[0, 1]}
-        elif face1 == "D" and face2 == "F":
-            return {"D": self.down[0, 1], "F": self.front[2, 1]}
+            return (self.upper[1, 0], self.left[0, 1])
+        elif face1 == "U" and face2 == "B":
+            return (self.upper[0, 1], self.back[0, 1])
         elif face1 == "D" and face2 == "R":
-            return {"D": self.down[1, 2], "R": self.right[2, 1]}
-        elif face1 == "D" and face2 == "B":
-            return {"D": self.down[2, 1], "B": self.back[2, 1]}
+            return (self.down[1, 2], self.right[2, 1])
+        elif face1 == "D" and face2 == "F":
+            return (self.down[0, 1], self.front[2, 1])
         elif face1 == "D" and face2 == "L":
-            return {"D": self.down[1, 0], "L": self.left[2, 1]}
+            return (self.down[1, 0], self.left[2, 1])
+        elif face1 == "D" and face2 == "B":
+            return (self.down[2, 1], self.back[2, 1])
         elif face1 == "F" and face2 == "R":
-            return {"F": self.front[1, 2], "R": self.right[1, 0]}
+            return (self.front[1, 2], self.right[1, 0])
         elif face1 == "F" and face2 == "L":
-            return {"F": self.front[1, 0], "L": self.left[1, 2]}
-        elif face1 == "B" and face2 == "R":
-            return {"B": self.back[1, 0], "R": self.right[1, 2]}
+            return (self.front[1, 0], self.left[1, 2])
         elif face1 == "B" and face2 == "L":
-            return {"B": self.back[1, 2], "L": self.left[1, 0]}
+            return (self.back[1, 2], self.left[1, 0])
+        elif face1 == "B" and face2 == "R":
+            return (self.back[1, 0], self.right[1, 2])
 
-    def get_edges_binary(self) -> list[int]:
-        ori_coord = []
-        for _, emplacement in enumerate(self.ARETES[:11]):
-            stickers = self.read_edge(emplacement)
-            ori = self.get_edge_orientation(stickers)
-            ori_coord.append(ori)
-        return ori_coord
+    def get_edges_binary(self) -> tuple[int]:
 
-    def get_corner_orientation(self, stickers: dict[str, str, str]) -> int:
-        first_ref, second_ref, _ = stickers.keys()
-        first_color = stickers[first_ref]
-        second_color = stickers[second_ref]
+        edges_coord = ()
+        for emplacement in self.ARETES:
+            stickers_colors = self.read_edge(emplacement)
+            ori = self.get_edge_orientation(stickers_colors)
+            edges_coord += (ori,)
+        return edges_coord
 
-        if first_color in self.COULEURS_UD:
-            return 0
-        elif second_color in self.COULEURS_UD:
-            return 1
-        else:
-            return 2
+    def get_corner_orientation(self, stickers_colors: tuple[str, str, str]) -> int:
+        for orientation, color in enumerate(stickers_colors):
+            if color in self.COULEURS_UD:
+                return orientation
 
-    def read_corner(self, emplacement: tuple[str, str, str]) -> dict[str, str, str]:
+    def read_corner(self, emplacement: tuple[str, str, str]) -> tuple[str, str, str]:
         face1, face2, face3 = emplacement
-        if face1 == "U" and face2 == "R" and face3 == "F":
-            return {"U": self.upper[2, 2], "R": self.right[0, 0], "F": self.front[0, 2]}
-        elif face1 == "U" and face2 == "F" and face3 == "L":
-            return {"U": self.upper[2, 0], "F": self.front[0, 0], "L": self.left[0, 2]}
-        elif face1 == "U" and face2 == "L" and face3 == "B":
-            return {"U": self.upper[0, 0], "L": self.left[0, 0], "B": self.back[0, 2]}
-        elif face1 == "U" and face2 == "B" and face3 == "R":
-            return {"U": self.upper[0, 2], "B": self.back[0, 0], "R": self.right[0, 2]}
-        elif face1 == "D" and face2 == "F" and face3 == "R":
-            return {"D": self.down[0, 2], "F": self.front[2, 2], "R": self.right[2, 0]}
-        elif face1 == "D" and face2 == "L" and face3 == "F":
-            return {"D": self.down[0, 0], "L": self.left[2, 2], "F": self.front[2, 0]}
-        elif face1 == "D" and face2 == "B" and face3 == "L":
-            return {"D": self.down[2, 0], "B": self.back[2, 2], "L": self.left[2, 0]}
+        if face1 == "U" and face2 == "R" and face3 == "B":
+            return (self.upper[0, 2], self.right[0, 2], self.back[0, 0])
+        elif face1 == "U" and face2 == "F" and face3 == "R":
+            return (self.upper[2, 2], self.front[0, 2], self.right[0, 0])
+        elif face1 == "U" and face2 == "L" and face3 == "F":
+            return (self.upper[2, 0], self.left[0, 2], self.front[0, 0])
+        elif face1 == "U" and face2 == "B" and face3 == "L":
+            return (self.upper[0, 0], self.back[0, 2], self.left[0, 0])
         elif face1 == "D" and face2 == "R" and face3 == "B":
-            return {"D": self.down[2, 2], "R": self.right[2, 2], "B": self.back[2, 0]}
+            return (self.down[2, 2], self.back[2, 0], self.right[2, 2])
+        elif face1 == "D" and face2 == "F" and face3 == "R":
+            return (self.down[0, 2], self.right[2, 0], self.front[2, 2])
+        elif face1 == "D" and face2 == "L" and face3 == "F":
+            return (self.down[0, 0], self.front[2, 0], self.left[2, 2])
+        elif face1 == "D" and face2 == "B" and face3 == "L":
+            return (self.down[2, 0], self.left[2, 0], self.back[2, 2])
 
-    def get_corners_binary(self) -> list[int]:
-        corners_coord = []
-        for _, emplacement in enumerate(self.CORNERS[:7]):
-            stickers = self.read_corner(emplacement)
-            ori = self.get_corner_orientation(stickers)
-            corners_coord.append(ori)
+    def get_corners_binary(self) -> tuple[int]:
+
+        corners_coord = ()
+        for emplacement in self.CORNERS:
+            stickers_colors = self.read_corner(emplacement)
+            ori = self.get_corner_orientation(stickers_colors)
+            corners_coord += (ori,)
         return corners_coord
 
 

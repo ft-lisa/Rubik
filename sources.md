@@ -9,6 +9,7 @@ https://medium.com/@muhammadalikhan0003/kociembas-two-phase-algorithm-how-it-wor
 # Youtube
 https://www.youtube.com/watch?v=qns1vvi0WVo
 https://youtu.be/qns1vvi0WVo?is=1G5JPqNvIbRA8Mlw
+https://www.youtube.com/watch?v=fxwVmTI5nGM -> pour comprendre l'orientation des arêtes 
 
 
 # BFS 
@@ -17,3 +18,6 @@ https://www.geeksforgeeks.org/python/python-program-for-breadth-first-search-or-
 
 # IDA 
 https://www.geeksforgeeks.org/artificial-intelligence iterative-deepening-a-algorithm-ida-artificial-intelligence/
+
+# Github
+https://github.com/bellerb/RubiksCube_Solver
