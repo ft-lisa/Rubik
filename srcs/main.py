@@ -7,6 +7,7 @@ from srcs.rubik import rubik
 from srcs.bfs import bfs
 from srcs.ida import ida
 import sys
+import time
 
 
 def get_args() -> tuple[argparse.Namespace, argparse.ArgumentParser]:
@@ -23,12 +24,20 @@ def get_args() -> tuple[argparse.Namespace, argparse.ArgumentParser]:
         action="store_true",
         help="Enable hands-on mode for interactive cube manipulation",
     )
+    parser.add_argument(
+        "--calculate-heuristics",
+        action="store_true",
+        help="Calculate heuristics for all configurations",
+    )
+
     return parser.parse_args(), parser
 
 
 def check_args(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
-    if not args.moves and not args.hands_on:
-        parser.error("At least one of --moves or --hands-on must be provided.")
+    if not args.moves and not args.hands_on and not args.calculate_heuristics:
+        parser.error(
+            "At least one of --moves, --hands-on, or --calculate-heuristics must be provided."
+        )
 
 
 def input(key):
@@ -53,11 +62,13 @@ def apply_moves(moves):
         mix_cube(real_moves)
         rubik.shuffle_rubik(real_moves)
 
-        bfs.calculate_heuristic()
-        bfs.calculate_resolution()
+        bfs.load_heuristics()
 
-        # moves = ida.run()
-        # print("Moves to solve the cube:", moves)
+        start = time.time()
+        moves = ida.run()
+        print("Moves to solve the cube:", moves)
+        end = time.time()
+        print("Time taken to solve the cube:", end - start)
         # # app.run()
     else:
         raise ValueError(
@@ -78,6 +89,9 @@ def main():
         check_args(args, parser)
         if args.hands_on:
             apply_hands_on()
+        if args.calculate_heuristics:
+            bfs.calculate_heuristic()
+            # bfs.calculate_resolution()
         elif args.moves:
             apply_moves(args.moves)
     except (ValueError, AssertionError) as error:

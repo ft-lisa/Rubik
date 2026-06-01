@@ -1,10 +1,14 @@
 from srcs.rubik import rubik
 import time
+import pickle
+import os
 
 
 class BFS:
 
     def __init__(self):
+        self.dir_path = f"heuristics/"
+
         self.visited_edges = {}
         self.visited_corners = {}
         self.visited_slice = {}
@@ -13,6 +17,44 @@ class BFS:
         self.resolved_corners = {}
 
         self.max_depth = 40
+
+    def save_heuristics(self, name: str) -> None:
+        full_name = f"{self.dir_path}{name}"
+
+        if not os.path.exists(self.dir_path):
+            os.makedirs(self.dir_path)
+
+        if name == "edges":
+            with open(f"{full_name}_heuristic.pkl", "wb") as f:
+                pickle.dump(self.visited_edges, f)
+        elif name == "corners":
+            with open(f"{full_name}_heuristic.pkl", "wb") as f:
+                pickle.dump(self.visited_corners, f)
+        elif name == "slices":
+            with open(f"{full_name}_heuristic.pkl", "wb") as f:
+                pickle.dump(self.visited_slice, f)
+
+    def load_heuristics(self) -> None:
+
+        if not os.path.exists(self.dir_path):
+            raise FileNotFoundError(
+                f"Heuristic directory '{self.dir_path}' not found. Please calculate heuristics first."
+            )
+
+        for file in os.listdir(self.dir_path):
+            if file.endswith("edges_heuristic.pkl"):
+                with open(f"{self.dir_path}{file}", "rb") as f:
+                    self.visited_edges = pickle.load(f)
+            elif file.endswith("corners_heuristic.pkl"):
+                with open(f"{self.dir_path}{file}", "rb") as f:
+                    self.visited_corners = pickle.load(f)
+            else:
+                with open(f"{self.dir_path}{file}", "rb") as f:
+                    self.visited_slice = pickle.load(f)
+
+        print(len(self.visited_edges))
+        print(len(self.visited_corners))
+        print(len(self.visited_slice))
 
     def apply_edge_move(self, state: tuple[int], move: int) -> tuple[int]:
         perm = rubik.move_ep[move]
@@ -53,6 +95,8 @@ class BFS:
                     self.visited_edges[new_eo] = depth + 1
                     queue.append((new_eo, depth + 1))
 
+        self.save_heuristics("edges")
+
     def apply_corner_move(self, state: tuple[int], move: int) -> tuple[int]:
         perm = rubik.move_cp[move]
         twist = rubik.move_co[move]
@@ -92,52 +136,50 @@ class BFS:
                     self.visited_corners[new_co] = depth + 1
                     queue.append((new_co, depth + 1))
 
-    # def apply_slice_move(self, state: tuple[int], move: int) -> tuple[int]:
-    #     perm = rubik.move_ep[move]
+        self.save_heuristics("corners")
 
-    #     new_slice = [0] * 12
+    def apply_slice_move(self, state: tuple[int], move: int) -> tuple[int]:
+        perm = rubik.move_ep[move]
 
-    #     # state[i] == 1 si la position i contient une arete de tranche.
-    #     # On suit uniquement la position (pas l'identite), donc on applique
-    #     # la meme permutation que pour les aretes au masque tranche/pas-tranche.
-    #     for i in range(12):
-    #         new_slice[i] = state[perm[i]]
+        new_slice = [0] * 12
 
-    #     return tuple(new_slice)
+        # state[i] == 1 si la position i contient une arete de tranche.
+        # On suit uniquement la position (pas l'identite), donc on applique
+        # la meme permutation que pour les aretes au masque tranche/pas-tranche.
+        for i in range(12):
+            new_slice[i] = state[perm[i]]
 
-    # def build_slice_heuristic(
-    #     self,
-    # ) -> dict:
+        return tuple(new_slice)
 
-    #     start_slice = tuple([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1])
+    def build_slice_heuristic(
+        self,
+    ) -> dict:
 
-    #     queue = [(start_slice, 0)]
+        start_slice = tuple([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1])
 
-    #     self.visited_slice[start_slice] = 0
+        queue = [(start_slice, 0)]
 
-    #     while queue:
-    #         state, depth = queue.pop(0)
+        self.visited_slice[start_slice] = 0
 
-    #         if depth >= self.max_depth:
-    #             continue
+        while queue:
+            state, depth = queue.pop(0)
 
-    #         for move in rubik.moves:
-    #             new_slice = self.apply_slice_move(state, move)
+            if depth >= self.max_depth:
+                continue
 
-    #             if new_slice not in self.visited_slice:
-    #                 self.visited_slice[new_slice] = depth + 1
-    #                 queue.append((new_slice, depth + 1))
+            for move in rubik.moves:
+                new_slice = self.apply_slice_move(state, move)
+
+                if new_slice not in self.visited_slice:
+                    self.visited_slice[new_slice] = depth + 1
+                    queue.append((new_slice, depth + 1))
+
+        self.save_heuristics("slices")
 
     def calculate_heuristic(self) -> None:
         self.build_edges_heuristic()
         self.build_corner_heuristic()
-        # self.build_slice_heuristic()
-
-        print(len(self.visited_edges))
-        print(len(self.visited_corners))
-        print(len(self.visited_slice))
-
-        print(self.visited_slice)
+        self.build_slice_heuristic()
 
     def apply_edge_permutation(self, move: int, prev_state: tuple[int]) -> tuple[int]:
         perm = rubik.move_ep[move]

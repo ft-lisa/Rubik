@@ -22,6 +22,15 @@ class Rubik:
 
         self.moves = self.legal_moves | self.illegal_moves
 
+        self.OPPOSITE_FACES = {
+            "U": "D",
+            "D": "U",
+            "R": "L",
+            "L": "R",
+            "F": "B",
+            "B": "F",
+        }
+
         self.move_eo = {
             "U": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             "D": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -403,24 +412,24 @@ class Rubik:
             corners_coord += (ori,)
         return corners_coord
 
-    # def get_middle_edge_orientation(self, stickers_colors: tuple[str, str]) -> int:
-    #     first_color, second_color = stickers_colors
+    def get_middle_edge_orientation(self, stickers_colors: tuple[str, str]) -> int:
+        first_color, second_color = stickers_colors
 
-    #     return (
-    #         1
-    #         if (first_color in self.LR_COLORS or first_color in self.FB_COLORS)
-    #         and (second_color in self.LR_COLORS or second_color in self.FB_COLORS)
-    #         else 0
-    #     )
+        return (
+            1
+            if (first_color in self.LR_COLORS or first_color in self.FB_COLORS)
+            and (second_color in self.LR_COLORS or second_color in self.FB_COLORS)
+            else 0
+        )
 
-    # def get_slice_binary(self) -> tuple[int]:
+    def get_slice_binary(self) -> tuple[int]:
 
-    #     slice_coord = ()
-    #     for emplacement in self.EDGES:
-    #         stickers_colors = self.read_edge(emplacement)
-    #         ori = self.get_middle_edge_orientation(stickers_colors)
-    #         slice_coord += (ori,)
-    #     return slice_coord
+        slice_coord = ()
+        for emplacement in self.EDGES:
+            stickers_colors = self.read_edge(emplacement)
+            ori = self.get_middle_edge_orientation(stickers_colors)
+            slice_coord += (ori,)
+        return slice_coord
 
 
 rubik = Rubik()
