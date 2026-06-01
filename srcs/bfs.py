@@ -15,6 +15,7 @@ class BFS:
 
         self.resolved_edges = {}
         self.resolved_corners = {}
+        self.resolved_slice = {}
 
         self.max_depth = 40
 
@@ -52,9 +53,6 @@ class BFS:
                 with open(f"{self.dir_path}{file}", "rb") as f:
                     self.visited_slice = pickle.load(f)
 
-        print(len(self.visited_edges))
-        print(len(self.visited_corners))
-        print(len(self.visited_slice))
 
     def apply_edge_move(self, state: tuple[int], move: int) -> tuple[int]:
         perm = rubik.move_ep[move]
@@ -184,28 +182,25 @@ class BFS:
     def apply_edge_permutation(self, move: int, prev_state: tuple[int]) -> tuple[int]:
         perm = rubik.move_ep[move]
 
-        new_er = [0] * 12
-        new_state = [0] * 12
+        new_state = [0] * 8
 
         # print("-" * 30)
         # print("prev_state", prev_state)
 
-        for i in range(12):
+        for i in range(8):
             new_state[i] = prev_state[perm[i]]
-            new_er[i] = 0 if i == new_state[i] else 1
             # print(prev_state[perm[i]])
             # print("new_state", new_state)
             # print("new_er", new_er)
 
-        return tuple(new_er), new_state
+        return new_state
 
     def build_edges_resolution(self) -> None:
 
-        prev_state = tuple([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
-        start_er = tuple([0] * 12)
+        prev_state = tuple([0, 1, 2, 3, 4, 5, 6, 7])
 
         queue = [(prev_state, 0)]
-        self.resolved_edges[start_er] = 0
+        self.resolved_edges[prev_state] = 0
 
         while queue:
             prev_state, depth = queue.pop(0)
@@ -216,23 +211,106 @@ class BFS:
             for move in rubik.legal_moves:
                 # print("-" * 20)
                 # print("Applying move:", move)
-                new_er, new_state = self.apply_edge_permutation(move, prev_state)
+                new_state = tuple(self.apply_edge_permutation(move, prev_state))
 
-                # print("new_er", new_er)
-                # print("new_state", new_state)
-
-                if new_er not in self.resolved_edges:
-                    self.resolved_edges[new_er] = depth + 1
+                if new_state not in self.resolved_edges:
+                    self.resolved_edges[new_state] = depth + 1
                     queue.append((new_state, depth + 1))
+
+
+    def apply_corner_permutation(self, move: int, prev_state: tuple[int]) -> tuple[int]:
+        perm = rubik.move_cp[move]
+
+        new_po = [0] * 8
+
+        # permutation des positions
+        for i in range(8):
+
+            new_po[i] = prev_state[perm[i]]
+
+        return tuple(new_po)
+
+    def build_corners_resolution(
+        self,
+    ) -> dict:
+
+        start_cp = tuple([0, 1, 2, 3, 4, 5, 6, 7])
+
+        queue = [(start_cp, 0)]
+
+        self.resolved_corners[start_cp] = 0
+
+        while queue:
+            prev_cp, depth= queue.pop(0)
+
+            if depth >= self.max_depth:
+                continue
+
+            for move in rubik.legal_moves:
+                new_cp = self.apply_corner_permutation(move, prev_cp)
+
+                if new_cp not in self.resolved_corners:
+                    self.resolved_corners[new_cp] = depth + 1
+                    queue.append((new_cp, depth + 1))
+
+    def apply_slice_permutation(self, prev_slice: tuple[int], move: int) -> tuple[int]:
+        perm = rubik.move_ep[move]
+
+        new_slice = [0] * 12
+
+        # state[i] == 1 si la position i contient une arete de tranche.
+        # On suit uniquement la position (pas l'identite), donc on applique
+        # la meme permutation que pour les aretes au masque tranche/pas-tranche.
+        for i in range(12):
+            new_slice[i] = prev_slice[perm[i]]
+
+        return tuple(new_slice)
+
+    def build_slice_resolution(
+        self,
+    ) -> dict:
+
+        start_slice = tuple([0, 0, 0, 0, 0, 0, 0, 0, 8, 9, 10, 11])
+
+        queue = [(start_slice, 0)]
+
+        self.resolved_slice[start_slice] = 0
+
+        while queue:
+            prev_slice, depth = queue.pop(0)
+
+            if depth >= self.max_depth:
+                continue
+
+            for move in rubik.legal_moves:
+                new_slice = self.apply_slice_permutation(prev_slice, move)
+
+                if new_slice not in self.resolved_slice:
+                    self.resolved_slice[new_slice] = depth + 1
+                    queue.append((new_slice, depth + 1))
+
 
     def calculate_resolution(self) -> None:
         start_time = time.time()
         self.build_edges_resolution()
+        self.build_corners_resolution()
+        self.build_slice_resolution()
 
         end_time = time.time()
         print(f"Resolution time: {end_time - start_time}")
-        print(len(self.resolved_edges))
-        # print(self.resolved_edges)
+
+        table = self.resolved_slice
+        by_depth = {}
+        for state_key, depth in table.items():
+            if depth not in by_depth:
+                by_depth[depth] = 0
+            by_depth[depth] += 1
+
+        print("\nStates by distance from solved:")
+        for depth in sorted(by_depth.keys()):
+            print(f"  Depth {depth}: {by_depth[depth]:,} states")
+
+        print(f"\nExtracted {len(table):,} unique CO states")
 
 
 bfs = BFS()
