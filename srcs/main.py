@@ -54,10 +54,11 @@ def apply_moves(moves):
         rubik.shuffle_rubik(real_moves)
 
         bfs.calculate_heuristic()
+        bfs.calculate_resolution()
 
-        moves = ida.run()
-        print("Moves to solve the cube:", moves)
-        app.run()
+        # moves = ida.run()
+        # print("Moves to solve the cube:", moves)
+        # # app.run()
     else:
         raise ValueError(
             "Invalid move sequence. Moves must be in the format: "

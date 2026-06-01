@@ -1,10 +1,11 @@
 # Rubik visualizater
 https://onlinecube.com/#solver
 
-# Medium
+# Articles
 https://medium.com/@diegomesamarrero/rubiks-cube-in-python-using-numpy-and-opencv-a8abfa2d8216
 https://medium.com/data-science/rubiks-cube-solver-96fa6c56fbe4
 https://medium.com/@muhammadalikhan0003/kociembas-two-phase-algorithm-how-it-works-and-its-applications-3d8f97a3562a
+https://www.cuberoot.me/en/code/algorithms/kociemba
 
 # Youtube
 https://www.youtube.com/watch?v=qns1vvi0WVo
@@ -21,3 +22,4 @@ https://www.geeksforgeeks.org/artificial-intelligence iterative-deepening-a-algo
 
 # Github
 https://github.com/bellerb/RubiksCube_Solver
+

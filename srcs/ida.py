@@ -14,8 +14,13 @@ class IDA_STAR:
 
         eo_key = rubik.get_edges_binary()
         co_key = rubik.get_corners_binary()
+        # so_key = rubik.get_slice_binary()
 
-        self.threshold = max(bfs.visited_edges[eo_key], bfs.visited_corners[co_key])
+        self.threshold = max(
+            bfs.visited_edges[eo_key],
+            bfs.visited_corners[co_key],
+            # bfs.visited_slice[so_key],
+        )
 
         while True:
             self.min_threshold = float("inf")
@@ -30,8 +35,13 @@ class IDA_STAR:
         for move in rubik.moves:
             new_eo = bfs.apply_edge_move(eo_key, move)
             new_co = bfs.apply_corner_move(co_key, move)
+            # new_so = bfs.apply_slice_move(so_key, move)
 
-            h_score = max(bfs.visited_edges[new_eo], bfs.visited_corners[new_co])
+            h_score = max(
+                bfs.visited_edges[new_eo],
+                bfs.visited_corners[new_co],
+                # bfs.visited_slice[new_so],
+            )
             if h_score == 0:
                 self.moves.append(move)
                 return True

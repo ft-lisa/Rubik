@@ -6,20 +6,21 @@ class Rubik:
 
     def __init__(self):
         self.colors = ["G", "B", "R", "O", "W", "Y"]
-        self.moves = [
+
+        self.illegal_moves = {
             "F",
             "F'",
-            "R",
-            "R'",
-            "U",
-            "U'",
             "B",
             "B'",
+            "R",
+            "R'",
             "L",
             "L'",
-            "D",
-            "D'",
-        ]
+        }
+
+        self.legal_moves = {"U", "U'", "D", "D'", "U2", "D2", "L2", "R2", "F2", "B2"}
+
+        self.moves = self.legal_moves | self.illegal_moves
 
         self.move_eo = {
             "U": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -34,6 +35,12 @@ class Rubik:
             "L'": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             "F'": [0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0],
             "B'": [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1],
+            "F2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "B2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "R2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "L2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "U2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "D2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         }
 
         self.move_ep = {
@@ -49,6 +56,12 @@ class Rubik:
             "L'": [0, 1, 9, 3, 4, 5, 10, 7, 8, 6, 2, 11],
             "F'": [0, 8, 2, 3, 4, 9, 6, 7, 5, 1, 10, 11],
             "B'": [0, 1, 2, 10, 4, 5, 6, 11, 8, 9, 7, 3],
+            "U2": [2, 3, 0, 1, 4, 5, 6, 7, 8, 9, 10, 11],
+            "D2": [0, 1, 2, 3, 6, 7, 4, 5, 8, 9, 10, 11],
+            "R2": [4, 1, 2, 3, 0, 5, 6, 7, 11, 9, 10, 8],
+            "L2": [0, 1, 6, 3, 4, 5, 2, 7, 8, 10, 9, 11],
+            "F2": [0, 5, 2, 3, 4, 1, 6, 7, 9, 8, 10, 11],
+            "B2": [0, 1, 2, 7, 4, 5, 6, 3, 8, 9, 11, 10],
         }
 
         self.move_co = {
@@ -64,6 +77,12 @@ class Rubik:
             "L'": [0, 0, 2, 1, 0, 0, 1, 2],
             "F'": [0, 2, 1, 0, 0, 1, 2, 0],
             "B'": [1, 0, 0, 2, 2, 0, 0, 1],
+            "U2": [0, 0, 0, 0, 0, 0, 0, 0],
+            "D2": [0, 0, 0, 0, 0, 0, 0, 0],
+            "R2": [0, 0, 0, 0, 0, 0, 0, 0],
+            "L2": [0, 0, 0, 0, 0, 0, 0, 0],
+            "F2": [0, 0, 0, 0, 0, 0, 0, 0],
+            "B2": [0, 0, 0, 0, 0, 0, 0, 0],
         }
 
         self.move_cp = {
@@ -79,12 +98,19 @@ class Rubik:
             "L'": [0, 1, 6, 2, 4, 5, 7, 3],
             "F'": [0, 5, 1, 3, 4, 6, 2, 7],
             "B'": [3, 1, 2, 7, 0, 5, 6, 4],
+            "U2": [2, 3, 0, 1, 4, 5, 6, 7],
+            "D2": [0, 1, 2, 3, 6, 7, 4, 5],
+            "R2": [5, 4, 2, 3, 1, 0, 6, 7],
+            "L2": [0, 1, 7, 6, 4, 5, 3, 2],
+            "F2": [0, 6, 5, 3, 4, 2, 1, 7],
+            "B2": [7, 1, 2, 4, 3, 5, 6, 0],
         }
 
-        self.COULEURS_UD = {"W", "Y"}
-        self.COULEURS_LR = {"O", "R"}
+        self.UD_COLORS = {"W", "Y"}
+        self.LR_COLORS = {"O", "R"}
+        self.FB_COLORS = {"G", "B"}
 
-        self.ARETES = [
+        self.EDGES = [
             ("U", "R"),
             ("U", "F"),
             ("U", "L"),
@@ -137,6 +163,11 @@ class Rubik:
 
             self.rotate_face(move, direction)
 
+    def apply_move(self, move: str) -> None:
+        move, direction = determine_move(move)
+
+        self.rotate_face(move, direction)
+
     def update_rubik(self) -> None:
         self.rubik = np.array(
             [self.front, self.back, self.right, self.left, self.upper, self.down]
@@ -165,6 +196,24 @@ class Rubik:
             self.rotate_L(direction)
         elif face == "D":
             self.rotate_D(direction)
+        elif face == "F2":
+            self.rotate_F(1)
+            self.rotate_F(1)
+        elif face == "R2":
+            self.rotate_R(1)
+            self.rotate_R(1)
+        elif face == "U2":
+            self.rotate_U(1)
+            self.rotate_U(1)
+        elif face == "B2":
+            self.rotate_B(1)
+            self.rotate_B(1)
+        elif face == "L2":
+            self.rotate_L(1)
+            self.rotate_L(1)
+        elif face == "D2":
+            self.rotate_D(1)
+            self.rotate_D(1)
 
         self.update_rubik()
 
@@ -282,9 +331,7 @@ class Rubik:
         first_color, second_color = stickers_colors
 
         return (
-            1
-            if first_color in self.COULEURS_LR or second_color in self.COULEURS_UD
-            else 0
+            1 if first_color in self.LR_COLORS or second_color in self.UD_COLORS else 0
         )
 
     def read_edge(self, emplacement: tuple[str, str]) -> tuple[str, str]:
@@ -317,7 +364,7 @@ class Rubik:
     def get_edges_binary(self) -> tuple[int]:
 
         edges_coord = ()
-        for emplacement in self.ARETES:
+        for emplacement in self.EDGES:
             stickers_colors = self.read_edge(emplacement)
             ori = self.get_edge_orientation(stickers_colors)
             edges_coord += (ori,)
@@ -325,7 +372,7 @@ class Rubik:
 
     def get_corner_orientation(self, stickers_colors: tuple[str, str, str]) -> int:
         for orientation, color in enumerate(stickers_colors):
-            if color in self.COULEURS_UD:
+            if color in self.UD_COLORS:
                 return orientation
 
     def read_corner(self, emplacement: tuple[str, str, str]) -> tuple[str, str, str]:
@@ -355,6 +402,25 @@ class Rubik:
             ori = self.get_corner_orientation(stickers_colors)
             corners_coord += (ori,)
         return corners_coord
+
+    # def get_middle_edge_orientation(self, stickers_colors: tuple[str, str]) -> int:
+    #     first_color, second_color = stickers_colors
+
+    #     return (
+    #         1
+    #         if (first_color in self.LR_COLORS or first_color in self.FB_COLORS)
+    #         and (second_color in self.LR_COLORS or second_color in self.FB_COLORS)
+    #         else 0
+    #     )
+
+    # def get_slice_binary(self) -> tuple[int]:
+
+    #     slice_coord = ()
+    #     for emplacement in self.EDGES:
+    #         stickers_colors = self.read_edge(emplacement)
+    #         ori = self.get_middle_edge_orientation(stickers_colors)
+    #         slice_coord += (ori,)
+    #     return slice_coord
 
 
 rubik = Rubik()
