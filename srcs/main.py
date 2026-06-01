@@ -2,7 +2,8 @@ from ursina import Ursina
 import argparse
 import srcs.cube as cube
 import srcs.controls as controls
-from srcs.parsing import parse_moves, mix_cube
+from srcs.parsing import parse_moves
+from srcs.utils import mix_cube
 from srcs.rubik import rubik
 from srcs.bfs import bfs
 from srcs.ida import ida
@@ -55,21 +56,22 @@ sys.modules["__main__"].update = update
 def apply_moves(moves):
     moves = moves.strip().split()
 
-    is_valid, real_moves = parse_moves(moves)
+    is_valid, parsed_moves = parse_moves(moves)
     if is_valid:
         app = Ursina()
         cube.create_cube()
-        mix_cube(real_moves)
-        rubik.shuffle_rubik(real_moves)
+        mix_cube(parsed_moves)
+        rubik.shuffle_rubik(parsed_moves)
 
         bfs.load_heuristics()
 
         start = time.time()
-        moves = ida.run()
+        moves = ida.run_G1()
+        rubik.shuffle_rubik(moves)
         print("Moves to solve the cube:", moves)
         end = time.time()
         print("Time taken to solve the cube:", end - start)
-        # # app.run()
+        # app.run()
     else:
         raise ValueError(
             "Invalid move sequence. Moves must be in the format: "
@@ -77,7 +79,7 @@ def apply_moves(moves):
         )
 
 
-def apply_hands_on():
+def hands_on():
     app = Ursina()
     cube.create_cube()
     app.run()
@@ -88,10 +90,9 @@ def main():
     try:
         check_args(args, parser)
         if args.hands_on:
-            apply_hands_on()
+            hands_on()
         if args.calculate_heuristics:
             bfs.calculate_heuristic()
-            # bfs.calculate_resolution()
         elif args.moves:
             apply_moves(args.moves)
     except (ValueError, AssertionError) as error:

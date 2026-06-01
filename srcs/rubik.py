@@ -1,5 +1,5 @@
 import numpy as np
-from srcs.parsing import determine_move
+from srcs.utils import determine_move
 
 
 class Rubik:
@@ -336,7 +336,7 @@ class Rubik:
             self.back[2, :] = self.left[2, :]
             self.left[2, :] = tmp
 
-    def get_edge_orientation(self, stickers_colors: tuple[str, str]) -> int:
+    def get_orientation_edge(self, stickers_colors: tuple[str, str]) -> int:
         first_color, second_color = stickers_colors
 
         return (
@@ -370,16 +370,16 @@ class Rubik:
         elif face1 == "B" and face2 == "R":
             return (self.back[1, 0], self.right[1, 2])
 
-    def get_edges_binary(self) -> tuple[int]:
+    def get_orientation_edges(self) -> tuple[int]:
 
         edges_coord = ()
         for emplacement in self.EDGES:
             stickers_colors = self.read_edge(emplacement)
-            ori = self.get_edge_orientation(stickers_colors)
+            ori = self.get_orientation_edge(stickers_colors)
             edges_coord += (ori,)
         return edges_coord
 
-    def get_corner_orientation(self, stickers_colors: tuple[str, str, str]) -> int:
+    def get_orientation_corner(self, stickers_colors: tuple[str, str, str]) -> int:
         for orientation, color in enumerate(stickers_colors):
             if color in self.UD_COLORS:
                 return orientation
@@ -403,16 +403,16 @@ class Rubik:
         elif face1 == "D" and face2 == "B" and face3 == "L":
             return (self.down[2, 0], self.left[2, 0], self.back[2, 2])
 
-    def get_corners_binary(self) -> tuple[int]:
+    def get_orientation_corners(self) -> tuple[int]:
 
         corners_coord = ()
         for emplacement in self.CORNERS:
             stickers_colors = self.read_corner(emplacement)
-            ori = self.get_corner_orientation(stickers_colors)
+            ori = self.get_orientation_corner(stickers_colors)
             corners_coord += (ori,)
         return corners_coord
 
-    def get_middle_edge_orientation(self, stickers_colors: tuple[str, str]) -> int:
+    def get_position_slice(self, stickers_colors: tuple[str, str]) -> int:
         first_color, second_color = stickers_colors
 
         return (
@@ -422,14 +422,25 @@ class Rubik:
             else 0
         )
 
-    def get_slice_binary(self) -> tuple[int]:
+    def get_position_slices(self) -> tuple[int]:
 
         slice_coord = ()
         for emplacement in self.EDGES:
             stickers_colors = self.read_edge(emplacement)
-            ori = self.get_middle_edge_orientation(stickers_colors)
+            ori = self.get_position_slice(stickers_colors)
             slice_coord += (ori,)
         return slice_coord
+
+    # def get_permutation_edges(self) -> tuple[int]:
+    #     edges_perm = [0] * 12
+    #     for i, emplacement in enumerate(self.EDGES):
+    #         stickers_colors = self.read_edge(emplacement)
+    #         for j, target_emplacement in enumerate(self.EDGES):
+    #             target_stickers_colors = self.read_edge(target_emplacement)
+    #             if set(stickers_colors) == set(target_stickers_colors):
+    #                 edges_perm[i] = j
+    #                 break
+    #     return tuple(edges_perm)
 
 
 rubik = Rubik()
