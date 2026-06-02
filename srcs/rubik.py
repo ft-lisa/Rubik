@@ -153,8 +153,8 @@ class Rubik:
         self.SLICES_EDGES_COLORS = [
             ("G", "R"),
             ("G", "O"),
-            ("B", "R"),
             ("B", "O"),
+            ("B", "R"),
         ]
 
         self.EDGES_COLORS = self.UD_EDGES_COLORS + self.SLICES_EDGES_COLORS

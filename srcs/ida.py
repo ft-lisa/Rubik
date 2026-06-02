@@ -56,32 +56,28 @@ class IDA_STAR:
         prev_move: str = None,
     ) -> bool:
 
+        h_score = max(
+            bfs.eo_so[(eo_key, so_key)],
+            bfs.co_so[(co_key, so_key)],
+        )
+        if h_score == 0:
+            return True 
         for move in rubik.moves:
             if self.prune_branch(prev_move, move):
                 continue
-
-            new_eo = bfs.apply_orientation_edges(eo_key, move)
-            new_co = bfs.apply_orientation_corners(co_key, move)
-            new_so = bfs.apply_position_slices(so_key, move)
-
-            h_score = max(
-                bfs.eo_so[(eo_key, so_key)],
-                bfs.co_so[(co_key, so_key)],
-            )
-
-            if h_score == 0:
-                self.moves.append(move)
-                return True
 
             f_score = g_score + h_score
             if f_score > self.threshold:
                 self.min_threshold = min(self.min_threshold, f_score)
                 continue
 
+            new_eo = bfs.apply_orientation_edges(eo_key, move)
+            new_co = bfs.apply_orientation_corners(co_key, move)
+            new_so = bfs.apply_position_slices(so_key, move)
+
             self.moves.append(move)
             if self.search_G1(g_score + 1, new_eo, new_co, new_so, move):
                 return True
-
             self.moves.pop()
 
         return False
@@ -120,36 +116,32 @@ class IDA_STAR:
         sp_key: tuple[int],
         prev_move: str = None,
     ) -> bool:
+        
+        h_score = max(
+            bfs.ep_sp[(ep_key, sp_key)],
+            bfs.cp_sp[(cp_key, sp_key)],
+        )
+        if h_score == 0:
+            return True  # résolu, on n'ajoute rien
 
         for move in rubik.legal_moves:
             if self.prune_branch(prev_move, move):
                 continue
-
-            new_ep = bfs.apply_permutation_edges(ep_key, move)
-            new_cp = bfs.apply_permutation_corners(cp_key, move)
-            new_sp = bfs.apply_permutation_slices(sp_key, move)
-
-            h_score = max(
-                bfs.ep_sp[(new_ep, new_sp)],
-                bfs.cp_sp[(new_cp, new_sp)],
-            )
-
-            if h_score == 0:
-                self.moves.append(move)
-                return True
 
             f_score = g_score + h_score
             if f_score > self.threshold:
                 self.min_threshold = min(self.min_threshold, f_score)
                 continue
 
+            new_ep = bfs.apply_permutation_edges(ep_key, move)
+            new_cp = bfs.apply_permutation_corners(cp_key, move)
+            new_sp = bfs.apply_permutation_slices(sp_key, move)
+
             self.moves.append(move)
             if self.search_resolution(g_score + 1, new_ep, new_cp, new_sp, move):
                 return True
-
             self.moves.pop()
 
         return False
-
 
 ida = IDA_STAR()

@@ -8,6 +8,7 @@ from srcs.bfs import bfs
 from srcs.ida import ida
 import sys
 import time
+from srcs.utils import mix_cube
 
 
 def get_args() -> tuple[argparse.Namespace, argparse.ArgumentParser]:
@@ -57,9 +58,9 @@ def apply_moves(moves):
 
     is_valid, parsed_moves = parse_moves(moves)
     if is_valid:
-        # app = Ursina()
-        # cube.create_cube()
-        # mix_cube(parsed_moves)
+        app = Ursina()
+        cube.create_cube()
+        mix_cube(parsed_moves)
         rubik.shuffle_rubik(parsed_moves)
         rubik.show_rubik()
 
@@ -67,18 +68,23 @@ def apply_moves(moves):
 
         start = time.time()
         g1_moves = ida.run_G1()
-        rubik.shuffle_rubik(g1_moves)
+        if g1_moves:
+            rubik.shuffle_rubik(g1_moves)
         print("Moves to reach G1:", str(g1_moves))
         rubik.show_rubik()
 
         resolution_moves = ida.run_resolution()
+        if resolution_moves:
+            rubik.shuffle_rubik(resolution_moves)
         rubik.show_rubik()
         end = time.time()
         print("Moves to solve the cube:", resolution_moves)
         print("Total moves to solve the cube:", g1_moves + resolution_moves)
         print("Time taken to solve the cube:", end - start)
+        full_moves = g1_moves + resolution_moves
+        # mix_cube(g1_moves)
 
-        # app.run()
+        app.run()
     else:
         raise ValueError(
             "Invalid move sequence. Moves must be in the format: "
