@@ -119,7 +119,7 @@ class Rubik:
         self.LR_COLORS = {"O", "R"}
         self.FB_COLORS = {"G", "B"}
 
-        self.EDGES = [
+        self.UD_EDGES = [
             ("U", "R"),
             ("U", "F"),
             ("U", "L"),
@@ -128,11 +128,36 @@ class Rubik:
             ("D", "F"),
             ("D", "L"),
             ("D", "B"),
+        ]
+
+        self.SLICES_EDGES = [
             ("F", "R"),
             ("F", "L"),
             ("B", "L"),
             ("B", "R"),
         ]
+
+        self.EDGES = self.UD_EDGES + self.SLICES_EDGES
+
+        self.UD_EDGES_COLORS = [
+            ("W", "R"),
+            ("W", "G"),
+            ("W", "O"),
+            ("W", "B"),
+            ("Y", "R"),
+            ("Y", "G"),
+            ("Y", "O"),
+            ("Y", "B"),
+        ]
+
+        self.SLICES_EDGES_COLORS = [
+            ("G", "R"),
+            ("G", "O"),
+            ("B", "R"),
+            ("B", "O"),
+        ]
+
+        self.EDGES_COLORS = self.UD_EDGES_COLORS + self.SLICES_EDGES_COLORS
 
         self.CORNERS = [
             ("U", "R", "B"),
@@ -143,6 +168,17 @@ class Rubik:
             ("D", "F", "R"),
             ("D", "L", "F"),
             ("D", "B", "L"),
+        ]
+
+        self.CORNERS_COLORS = [
+            ("W", "R", "B"),
+            ("W", "G", "R"),
+            ("W", "O", "G"),
+            ("W", "B", "O"),
+            ("Y", "R", "B"),
+            ("Y", "G", "R"),
+            ("Y", "O", "G"),
+            ("Y", "B", "O"),
         ]
 
         self.initialize_cube()
@@ -165,6 +201,27 @@ class Rubik:
             for col in range(3):
                 face[row, col] = color
         return face
+
+    def show_rubik(self) -> None:
+        print("Front:\n", self.front)
+        print("Back:\n", self.back)
+        print("Right:\n", self.right)
+        print("Left:\n", self.left)
+        print("Upper:\n", self.upper)
+        print("Down:\n", self.down)
+
+    def solved(self) -> bool:
+        for face in [
+            self.front,
+            self.back,
+            self.right,
+            self.left,
+            self.upper,
+            self.down,
+        ]:
+            if not np.all(face == face[0, 0]):
+                return False
+        return True
 
     def shuffle_rubik(self, moves: list[str]) -> None:
         for move in moves:
@@ -343,8 +400,8 @@ class Rubik:
             1 if first_color in self.LR_COLORS or second_color in self.UD_COLORS else 0
         )
 
-    def read_edge(self, emplacement: tuple[str, str]) -> tuple[str, str]:
-        face1, face2 = emplacement
+    def read_edge(self, edge: tuple[str, str]) -> tuple[str, str]:
+        face1, face2 = edge
         if face1 == "U" and face2 == "R":
             return (self.upper[1, 2], self.right[0, 1])
         elif face1 == "U" and face2 == "F":
@@ -373,8 +430,8 @@ class Rubik:
     def get_orientation_edges(self) -> tuple[int]:
 
         edges_coord = ()
-        for emplacement in self.EDGES:
-            stickers_colors = self.read_edge(emplacement)
+        for edge in self.EDGES:
+            stickers_colors = self.read_edge(edge)
             ori = self.get_orientation_edge(stickers_colors)
             edges_coord += (ori,)
         return edges_coord
@@ -384,8 +441,8 @@ class Rubik:
             if color in self.UD_COLORS:
                 return orientation
 
-    def read_corner(self, emplacement: tuple[str, str, str]) -> tuple[str, str, str]:
-        face1, face2, face3 = emplacement
+    def read_corner(self, corner: tuple[str, str, str]) -> tuple[str, str, str]:
+        face1, face2, face3 = corner
         if face1 == "U" and face2 == "R" and face3 == "B":
             return (self.upper[0, 2], self.right[0, 2], self.back[0, 0])
         elif face1 == "U" and face2 == "F" and face3 == "R":
@@ -406,8 +463,8 @@ class Rubik:
     def get_orientation_corners(self) -> tuple[int]:
 
         corners_coord = ()
-        for emplacement in self.CORNERS:
-            stickers_colors = self.read_corner(emplacement)
+        for corner in self.CORNERS:
+            stickers_colors = self.read_corner(corner)
             ori = self.get_orientation_corner(stickers_colors)
             corners_coord += (ori,)
         return corners_coord
@@ -425,22 +482,50 @@ class Rubik:
     def get_position_slices(self) -> tuple[int]:
 
         slice_coord = ()
-        for emplacement in self.EDGES:
-            stickers_colors = self.read_edge(emplacement)
+        for edge in self.EDGES:
+            stickers_colors = self.read_edge(edge)
             ori = self.get_position_slice(stickers_colors)
             slice_coord += (ori,)
         return slice_coord
 
-    # def get_permutation_edges(self) -> tuple[int]:
-    #     edges_perm = [0] * 12
-    #     for i, emplacement in enumerate(self.EDGES):
-    #         stickers_colors = self.read_edge(emplacement)
-    #         for j, target_emplacement in enumerate(self.EDGES):
-    #             target_stickers_colors = self.read_edge(target_emplacement)
-    #             if set(stickers_colors) == set(target_stickers_colors):
-    #                 edges_perm[i] = j
-    #                 break
-    #     return tuple(edges_perm)
+    def get_permutation_edges(self) -> tuple[int]:
+
+        edges_coord = ()
+        for edge in self.UD_EDGES:
+            stickers_colors = self.read_edge(edge)
+            for i in range(8):
+                if set(stickers_colors) == set(self.UD_EDGES_COLORS[i]):
+                    edges_coord += (i,)
+                    break
+        return edges_coord
+
+    def get_permutation_corners(self) -> tuple[int]:
+
+        corners_coord = ()
+        for corner in self.CORNERS:
+            stickers_colors = self.read_corner(corner)
+            for i in range(8):
+                if set(stickers_colors) == set(self.CORNERS_COLORS[i]):
+                    corners_coord += (i,)
+                    break
+        return corners_coord
+
+    def get_permutation_slices(self) -> tuple[int]:
+
+        slice_coord = ()
+        for edge in self.EDGES:
+            stickers_colors = self.read_edge(edge)
+            for i in range(12):
+                if (
+                    set(stickers_colors) == set(self.EDGES_COLORS[i])
+                    and edge in self.SLICES_EDGES
+                ):
+                    slice_coord += (i,)
+                    break
+                elif set(stickers_colors) == set(self.EDGES_COLORS[i]):
+                    slice_coord += (0,)
+                    break
+        return slice_coord
 
 
 rubik = Rubik()

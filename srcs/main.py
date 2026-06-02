@@ -3,7 +3,6 @@ import argparse
 import srcs.cube as cube
 import srcs.controls as controls
 from srcs.parsing import parse_moves
-from srcs.utils import mix_cube
 from srcs.rubik import rubik
 from srcs.bfs import bfs
 from srcs.ida import ida
@@ -58,19 +57,27 @@ def apply_moves(moves):
 
     is_valid, parsed_moves = parse_moves(moves)
     if is_valid:
-        app = Ursina()
-        cube.create_cube()
-        mix_cube(parsed_moves)
+        # app = Ursina()
+        # cube.create_cube()
+        # mix_cube(parsed_moves)
         rubik.shuffle_rubik(parsed_moves)
+        rubik.show_rubik()
 
         bfs.load_heuristics()
 
         start = time.time()
-        moves = ida.run_G1()
-        rubik.shuffle_rubik(moves)
-        print("Moves to solve the cube:", moves)
+        g1_moves = ida.run_G1()
+        rubik.shuffle_rubik(g1_moves)
+        print("Moves to reach G1:", str(g1_moves))
+        rubik.show_rubik()
+
+        resolution_moves = ida.run_resolution()
+        rubik.show_rubik()
         end = time.time()
+        print("Moves to solve the cube:", resolution_moves)
+        print("Total moves to solve the cube:", g1_moves + resolution_moves)
         print("Time taken to solve the cube:", end - start)
+
         # app.run()
     else:
         raise ValueError(

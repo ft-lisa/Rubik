@@ -23,15 +23,16 @@ class IDA_STAR:
 
     def run_G1(self) -> list[str]:
 
+        self.moves = []
+
         eo_key = rubik.get_orientation_edges()
         co_key = rubik.get_orientation_corners()
         so_key = rubik.get_position_slices()
 
         self.threshold = max(
             max(
-                bfs.orientation_edges[eo_key],
-                bfs.orientation_corners[co_key],
-                bfs.position_slices[so_key],
+                bfs.eo_so[(eo_key, so_key)],
+                bfs.co_so[(co_key, so_key)],
             ),
             self.threshold,
         )
@@ -64,10 +65,10 @@ class IDA_STAR:
             new_so = bfs.apply_position_slices(so_key, move)
 
             h_score = max(
-                bfs.orientation_edges[new_eo],
-                bfs.orientation_corners[new_co],
-                bfs.position_slices[new_so],
+                bfs.eo_so[(eo_key, so_key)],
+                bfs.co_so[(co_key, so_key)],
             )
+
             if h_score == 0:
                 self.moves.append(move)
                 return True
@@ -87,15 +88,16 @@ class IDA_STAR:
 
     def run_resolution(self) -> list[str]:
 
-        cp_key = rubik.get_orientation_edges()
-        ep_key = rubik.get_orientation_corners()
-        sp_key = rubik.get_position_slices()
+        self.moves = []
+
+        ep_key = rubik.get_permutation_edges()
+        cp_key = rubik.get_permutation_corners()
+        sp_key = rubik.get_permutation_slices()
 
         self.threshold = max(
             max(
-                bfs.orientation_edges[cp_key],
-                bfs.orientation_corners[ep_key],
-                bfs.position_slices[sp_key],
+                bfs.ep_sp[(ep_key, sp_key)],
+                bfs.cp_sp[(cp_key, sp_key)],
             ),
             self.threshold,
         )
@@ -103,8 +105,8 @@ class IDA_STAR:
         while True:
             self.min_threshold = float("inf")
             print("-" * 30)
-            print("Current threshold:", self.threshold)
-            status = self.search_resolution(0, cp_key, ep_key, sp_key)
+            print("Current threshold resolution:", self.threshold)
+            status = self.search_resolution(0, ep_key, cp_key, sp_key)
             if status:
                 return self.moves
             self.moves = []
@@ -113,25 +115,25 @@ class IDA_STAR:
     def search_resolution(
         self,
         g_score: int,
-        cp_key: tuple[int],
         ep_key: tuple[int],
+        cp_key: tuple[int],
         sp_key: tuple[int],
         prev_move: str = None,
     ) -> bool:
 
-        for move in rubik.moves:
+        for move in rubik.legal_moves:
             if self.prune_branch(prev_move, move):
                 continue
 
-            new_eo = bfs.apply_orientation_edges(cp_key, move)
-            new_co = bfs.apply_orientation_corners(ep_key, move)
-            new_so = bfs.apply_position_slices(sp_key, move)
+            new_ep = bfs.apply_permutation_edges(ep_key, move)
+            new_cp = bfs.apply_permutation_corners(cp_key, move)
+            new_sp = bfs.apply_permutation_slices(sp_key, move)
 
             h_score = max(
-                bfs.orientation_edges[new_eo],
-                bfs.orientation_corners[new_co],
-                bfs.position_slices[new_so],
+                bfs.ep_sp[(new_ep, new_sp)],
+                bfs.cp_sp[(new_cp, new_sp)],
             )
+
             if h_score == 0:
                 self.moves.append(move)
                 return True
@@ -142,7 +144,7 @@ class IDA_STAR:
                 continue
 
             self.moves.append(move)
-            if self.search_resolution(g_score + 1, new_eo, new_co, new_so, move):
+            if self.search_resolution(g_score + 1, new_ep, new_cp, new_sp, move):
                 return True
 
             self.moves.pop()
