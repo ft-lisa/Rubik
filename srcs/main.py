@@ -82,7 +82,7 @@ def apply_moves(moves):
         print("Total moves to solve the cube:", g1_moves + resolution_moves)
         print("Time taken to solve the cube:", end - start)
         full_moves = g1_moves + resolution_moves
-        # mix_cube(g1_moves)
+        mix_cube(full_moves)
 
         app.run()
     else:
