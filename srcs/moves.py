@@ -11,6 +11,12 @@ class Moves:
         "D": ("y", -1, "y", -1),
         "F": ("z", 1, "z", -1),
         "B": ("z", -1, "z", 1),
+        "R2": ("x", 1, "x", 1),
+        "L2": ("x", -1, "x", -1),
+        "U2": ("y", 1, "y", 1),
+        "D2": ("y", -1, "y", -1),
+        "F2": ("z", 1, "z", -1),
+        "B2": ("z", -1, "z", 1),
     }
 
     def __init__(self):
@@ -56,12 +62,14 @@ class Moves:
             if round(getattr(cube, selector_axis)) == selector_value:
                 cube.world_parent = pivot
 
+        turns = 2 if face.endswith("2") else 1
+
         pivot.position = (0, 0, 0)
 
         animate = getattr(pivot, f"animate_rotation_{axis}")
-        animate(sign * 90 * direction, duration=0.2, curve=curve.linear)
+        animate(sign * 90 * direction * turns , duration=0.2, curve=curve.linear)
 
-        invoke(lambda: self.finish_move(pivot), delay=0.2)
+        invoke(lambda: self.finish_move(pivot), delay=0.5)
 
     def mouv_R(self, direction):
         self.do_move("R", direction)
