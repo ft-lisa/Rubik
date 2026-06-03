@@ -18,31 +18,6 @@ def input(key):
     if key == "left mouse up":
         dragging = False
 
-    if key == "r":
-        rMoves.mouv_R(CLOCKWISE)
-    elif key == "l":
-        rMoves.mouv_L(CLOCKWISE)
-    elif key == "u":
-        rMoves.mouv_U(CLOCKWISE)
-    elif key == "d":
-        rMoves.mouv_D(CLOCKWISE)
-    elif key == "f":
-        rMoves.mouv_F(CLOCKWISE)
-    elif key == "b":
-        rMoves.mouv_B(CLOCKWISE)
-    elif key == "t":
-        rMoves.mouv_R(COUNTERCLOCKWISE)
-    elif key == ";":
-        rMoves.mouv_L(COUNTERCLOCKWISE)
-    elif key == "i":
-        rMoves.mouv_U(COUNTERCLOCKWISE)
-    elif key == "s":
-        rMoves.mouv_D(COUNTERCLOCKWISE)
-    elif key == "g":
-        rMoves.mouv_F(COUNTERCLOCKWISE)
-    elif key == "n":
-        rMoves.mouv_B(COUNTERCLOCKWISE)
-
 
 def update():
     global last_mouse_pos
