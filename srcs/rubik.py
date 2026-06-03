@@ -24,11 +24,8 @@ class Rubik:
 
         self.OPPOSITE_FACES = {
             "U": "D",
-            "D": "U",
             "R": "L",
-            "L": "R",
             "F": "B",
-            "B": "F",
         }
 
         self.move_eo = {
