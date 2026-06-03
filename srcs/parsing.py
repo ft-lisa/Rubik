@@ -1,6 +1,4 @@
-REVERSE_MODIFIERS = {"'", "’"}
-DOUBLE_MODIFIERS = {"2"}
-VALID_MOVES = {"F", "R", "U", "B", "L", "D"}
+from srcs.utils import VALID_MOVES, REVERSE_MODIFIERS, DOUBLE_MODIFIERS
 
 
 def parse_moves(moves: list[str]) -> tuple[bool, list[str]]:

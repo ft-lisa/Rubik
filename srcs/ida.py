@@ -30,11 +30,8 @@ class IDA_STAR:
         so_key = rubik.get_position_slices()
 
         self.threshold = max(
-            max(
-                bfs.eo_so[(eo_key, so_key)],
-                bfs.co_so[(co_key, so_key)],
-            ),
-            self.threshold,
+            bfs.eo_so[(eo_key, so_key)],
+            bfs.co_so[(co_key, so_key)],
         )
 
         while True:
@@ -95,11 +92,8 @@ class IDA_STAR:
         sp_key = rubik.get_permutation_slices()
 
         self.threshold = max(
-            max(
-                bfs.ep_sp[(ep_key, sp_key)],
-                bfs.cp_sp[(cp_key, sp_key)],
-            ),
-            self.threshold,
+            bfs.ep_sp[(ep_key, sp_key)],
+            bfs.cp_sp[(cp_key, sp_key)],
         )
 
         while True:

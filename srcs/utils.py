@@ -1,5 +1,8 @@
-from srcs.parsing import REVERSE_MODIFIERS
 from srcs.moves import rMoves
+
+REVERSE_MODIFIERS = ["'", "’"]
+DOUBLE_MODIFIERS = ["2"]
+VALID_MOVES = ["F", "R", "U", "B", "L", "D"]
 
 
 def determine_move(move: str) -> tuple[str, int]:

@@ -7,7 +7,7 @@ from collections import deque
 class BFS:
 
     def __init__(self):
-        self.dir_path = f"heuristics/"
+        self.dir_path = "heuristics/"
 
         self.eo_so = {}
         self.co_so = {}

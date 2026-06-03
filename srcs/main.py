@@ -7,12 +7,11 @@ from srcs.rubik import rubik
 from srcs.bfs import bfs
 from srcs.ida import ida
 import sys
-import time
 from srcs.utils import mix_cube
 
 
 def get_args() -> tuple[argparse.Namespace, argparse.ArgumentParser]:
-    parser = argparse.ArgumentParser(description="Image augmentation")
+    parser = argparse.ArgumentParser(description="Rubik's Cube Solver")
     parser.add_argument(
         "--moves",
         type=str,
@@ -65,14 +64,11 @@ def apply_moves(moves):
 
         bfs.load_heuristics()
 
-        start = time.time()
         g1_moves = ida.run_G1()
         if g1_moves:
             rubik.shuffle_rubik(g1_moves)
 
         resolution_moves = ida.run_resolution()
-
-        end = time.time()
 
         full_moves = g1_moves + resolution_moves
         mix_cube(full_moves)
