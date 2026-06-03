@@ -44,7 +44,7 @@ def main() -> None:
     for i in range(1, NB_TESTS + 1):
         scramble = random_scramble()
 
-        rubik.initialize_cube()
+        rubik.initialize()
         rubik.shuffle_rubik(scramble)
 
         start = time.time()

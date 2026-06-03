@@ -178,9 +178,9 @@ class Rubik:
             ("Y", "B", "O"),
         ]
 
-        self.initialize_cube()
+        self.initialize()
 
-    def initialize_cube(self) -> None:
+    def initialize(self) -> None:
         self.front = self.fill_grid(self.colors[0])
         self.back = self.fill_grid(self.colors[1])
         self.right = self.fill_grid(self.colors[2])
