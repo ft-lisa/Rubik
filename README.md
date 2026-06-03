@@ -1,6 +1,6 @@
 # Rubik
 
-**Rubik** is a 3D Rubik's Cube solver and visualizer. Give it a sequence of moves to scramble the cube, and it computes a solution and replays it in an interactive 3D window built with [Ursina](https://www.ursinaengine.org/).
+**Rubik** is a 3D Rubik's Cube solver and visualizer. Give it a sequence of moves to scramble the cube, and it computes a solution and replays it in an interactive 3D window.
 
 The solver is based on **Kociemba's two-phase algorithm**: instead of brute-forcing the whole cube at once (the search space is ~4.3 × 10¹⁹ states), the cube is solved in two smaller, tractable phases driven by an **IDA\*** search and pre-computed **BFS heuristic tables**.
 
@@ -13,13 +13,17 @@ A Rubik's Cube has 43 quintillion possible states. Searching all of them directl
 
 1. **Phase 1 — reach the G1 subgroup.** First we only care about *orientation*: getting every edge and corner correctly oriented, and moving the four "slice" edges (the FR, FL, BL, BR edges) into the middle layer. We allow all 18 moves (`U, U', U2, D, D2, ..., B2`).
 
+<img width="837" height="754" alt="rubik_G1" src="https://github.com/user-attachments/assets/6cca5664-ac17-49cc-81ab-f510816c3a56" />
+
 2. **Phase 2 — solve from G1.** From G1 the cube can be solved using only a restricted move set: `U, U', U2, D, D', D2, L2, R2, F2, B2`. These moves preserve the orientation already achieved, so we only have to fix *permutation* — putting every piece back in its home position.
+
+<img width="1999" height="1098" alt="rubik_solved" src="https://github.com/user-attachments/assets/f9d2e42f-979c-4faf-b4b8-3801c38a0a3c" />
 
 Splitting the work this way turns one gigantic search into two much shallower ones.
 
 ### Building the heuristic tables (BFS)
 
-For IDA\* to be fast, it needs a good *heuristic*: a lower bound on the number of moves still required. We pre-compute these bounds once with a **Breadth-First Search** and store them on disk as pickled dictionaries in [heuristics/](heuristics/).
+For IDA\* to be fast, it needs a good *heuristic*: a lower bound on the number of moves still required. We pre-compute these bounds once with a **Breadth-First Search** and store them on disk as pickled dictionaries.
 
 Each table maps a partial cube coordinate to the minimum number of moves needed to bring that coordinate back to its solved value. We build four of them:
 
@@ -68,7 +72,7 @@ All commands are run through `uv run`. At least one of `--moves`, `--hands-on`, 
 
 ### 1. Generate the heuristic tables
 
-Before solving for the first time, build the BFS heuristic tables. They are written to the [heuristics/](heuristics/) directory and only need to be generated once (This can take 1 or 2 minutes...)
+Before solving for the first time, build the BFS heuristic tables. They are written to the [heuristics/](heuristics/) directory and only need to be generated once (this can take 1 or 2 minutes...)
 
 ```bash
 uv run rubik --calculate-heuristics
