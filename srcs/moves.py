@@ -67,7 +67,7 @@ class Moves:
         pivot.position = (0, 0, 0)
 
         animate = getattr(pivot, f"animate_rotation_{axis}")
-        animate(sign * 90 * direction * turns , duration=0.2, curve=curve.linear)
+        animate(sign * 90 * direction * turns, duration=0.2, curve=curve.linear)
 
         invoke(lambda: self.finish_move(pivot), delay=0.5)
 

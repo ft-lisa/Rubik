@@ -62,7 +62,6 @@ def apply_moves(moves):
         cube.create_cube()
         mix_cube(parsed_moves)
         rubik.shuffle_rubik(parsed_moves)
-        rubik.show_rubik()
 
         bfs.load_heuristics()
 
@@ -70,17 +69,11 @@ def apply_moves(moves):
         g1_moves = ida.run_G1()
         if g1_moves:
             rubik.shuffle_rubik(g1_moves)
-        print("Moves to reach G1:", str(g1_moves))
-        rubik.show_rubik()
 
         resolution_moves = ida.run_resolution()
-        if resolution_moves:
-            rubik.shuffle_rubik(resolution_moves)
-        rubik.show_rubik()
+
         end = time.time()
-        print("Moves to solve the cube:", resolution_moves)
-        print("Total moves to solve the cube:", g1_moves + resolution_moves)
-        print("Time taken to solve the cube:", end - start)
+
         full_moves = g1_moves + resolution_moves
         mix_cube(full_moves)
 
