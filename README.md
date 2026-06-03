@@ -1,5 +1,7 @@
 # Rubik
 
+Made by [Lisa](https://github.com/ft-lisa) and [Mateo](https://github.com/MatLBS)  🥷🏻🥷🏻
+
 **Rubik** is a 3D Rubik's Cube solver and visualizer. Give it a sequence of moves to scramble the cube, and it computes a solution and replays it in an interactive 3D window.
 
 The solver is based on **Kociemba's two-phase algorithm**: instead of brute-forcing the whole cube at once (the search space is ~4.3 × 10¹⁹ states), the cube is solved in two smaller, tractable phases driven by an **IDA\*** search and pre-computed **BFS heuristic tables**.
@@ -138,3 +140,25 @@ rubik/
 ├── pyproject.toml          # Project metadata and dependencies (uv)
 └── README.md
 ```
+
+## Sources
+
+### Rubik visualizater
+- https://onlinecube.com/#solver
+
+### Articles
+- https://www.cuberoot.me/en/code/algorithms/kociemba
+- https://medium.com/data-science/rubiks-cube-solver-96fa6c56fbe4
+- https://medium.com/@muhammadalikhan0003/kociembas-two-phase-algorithm-how-it-works-and-its-applications-3d8f97a3562a
+
+### Youtube
+- https://www.youtube.com/watch?v=fxwVmTI5nGM -> To understand edge-orientation
+
+### BFS 
+- https://www.geeksforgeeks.org/python/python-program-for-breadth-first-search-or-bfs-for-a-graph/
+
+### IDA
+- https://www.geeksforgeeks.org/artificial-intelligence/iterative-deepening-a-algorithm-ida-artificial-intelligence/
+
+### GitHub
+- https://github.com/bellerb/RubiksCube_Solver
