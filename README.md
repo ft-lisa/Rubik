@@ -2,6 +2,10 @@
 
 Made by [Lisa](https://github.com/ft-lisa) and [Mateo](https://github.com/MatLBS)  🥷🏻🥷🏻
 
+## Live version 📡
+
+https://portfolio-rubik.vercel.app/
+
 **Rubik** is a 3D Rubik's Cube solver and visualizer. Give it a sequence of moves to scramble the cube, and it computes a solution and replays it in an interactive 3D window.
 
 The solver is based on **Kociemba's two-phase algorithm**: instead of brute-forcing the whole cube at once (the search space is ~4.3 × 10¹⁹ states), the cube is solved in two smaller, tractable phases driven by an **IDA\*** search and pre-computed **BFS heuristic tables**.
